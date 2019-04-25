@@ -13,12 +13,18 @@ df = pd.read_csv('https://raw.githubusercontent.com/nphardly/titanic/master/data
 
 numericList = list(df.select_dtypes(include=['int64']).columns)
 numericList.extend(list(df.select_dtypes(include=['float64']).columns))
-
+numericList.remove('Survived')
 categoricalList = list(df.select_dtypes(include=['O']).columns)
-
+#=========== feature type detection =================
+for name in numericList:
+    col_count = len(df[name].unique())
+    percent = col_count / df[name].count()
+    if (percent < 0.2):
+        categoricalList.append(name)
+        numericList.remove(name) 
+#====================================================
 numeric_features = numericList
 categorical_features = categoricalList
-
 
 # We create the preprocessing pipelines for both numeric and categorical data.
 numeric_transformer = Pipeline(steps=[
@@ -39,8 +45,8 @@ preprocessor = ColumnTransformer(
 clf = Pipeline(steps=[('preprocessor', preprocessor),
                       ('classifier', LogisticRegression(solver='lbfgs'))])
 
-X = df.drop('survived', axis=1)
-y = df['survived']
+X = df.drop('Survived', axis=1)
+y = df['Survived']
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
 
