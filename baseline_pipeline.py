@@ -25,9 +25,13 @@ df = pd.read_csv(titanic)
 threshold = 0.20
 targetLabel = 'Survived'
 
-### Replace Null values to NaN
-df.fillna(np.NaN,inplace=True)
-
+##### fill null values with respect to the column data-type ######
+def fill_null_data(col, col_type):
+    if (df[col].isnull().sum() > 0 and col_type == 'string'):
+        df[col].fillna('missing', inplace=True)
+    elif (df[col].isnull().sum() > 0 and col_type == 'numeric'):
+        df[col].fillna(df[col].mean(), inplace=True)
+            
 #####convert Date col to Datetime and split it to Year,Month,Day Columns###
 def split_datetime_col():
     #df['Date'] = pd.to_datetime(df['Date'])
@@ -45,8 +49,10 @@ def classify_columns_statistically(threshold=0.2):
         if (col == targetLabel):
             continue
         elif (ptypes.is_string_dtype(df[col])):
+            fill_null_data(col, 'string')
             categoric_list.append(col)
         elif (ptypes.is_numeric_dtype(df[col])):
+            fill_null_data(col, 'numeric')
             col_count = len(df[col].unique())
             percent = col_count / df[col].count()
             if (percent < threshold):
