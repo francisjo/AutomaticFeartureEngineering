@@ -41,7 +41,7 @@ def split_datetime_col():
             df[col+'_Month'] = pd.DatetimeIndex(df[col]).month
             df[col+'_Year'] = pd.DatetimeIndex(df[col]).year
          
-##### Classify Columns Wih Threshold####################
+##### Detect categorical and numrical variables by Frequency of unique value in Columns Wih Threshold####################
 def classify_columns_statistically(threshold=0.2):
     numeric_list = []
     categoric_list = []
@@ -59,6 +59,52 @@ def classify_columns_statistically(threshold=0.2):
                 categoric_list.append(col)
             else:
                 numeric_list.append(col)
+    return numeric_list, categoric_list
+
+##### Detect categorical and numrical variables by Frequency of unique value in Columns Wih Threshold####################
+def classify_columns_distribution(threshold=0.2):
+    numeric_list = []
+    categoric_list = []
+    for col in df.columns:
+        if (col == targetLabel):
+            continue
+        elif (ptypes.is_string_dtype(df[col])):
+            fill_null_data(col, 'string')
+            categoric_list.append(col)
+        elif (ptypes.is_numeric_dtype(df[col])):
+            fill_null_data(col, 'numeric')
+            value_count = df.groupby(col)[col].count()
+            col_dist = value_count /df[col].count()
+            if((col_dist[col_dist > threshold].count())>= 1):
+                categoric_list.append(col)
+            else:
+                numeric_list.append(col)
+    print('categoric_list :')
+    print(categoric_list)
+    print('numeric_list :')
+    print(numeric_list)
+    numeric_list1,categoric_list1 = classify_columns_correlation(numeric_list, categoric_list)
+    print('categoric_list1 :')
+    print(categoric_list1)
+    print('numeric_list1 :')
+    print(numeric_list1)
+    return numeric_list1, categoric_list1
+
+def classify_columns_correlation(numeric_list, categoric_list,threshold=0.2):
+    corr = df.corr()
+    for value in categoric_list:
+        if(ptypes.is_string_dtype(df[value])):
+            print('String value: ' + value)
+            continue
+        corr_values = corr[value]
+        corr_values = corr_values.drop(value)
+        for i in corr_values:
+            corr_values
+            if (i > 0.5 or i < -0.5) :
+                print('value: ' + value)
+                categoric_list.remove(value)
+                numeric_list.append(value)
+                break
     return numeric_list, categoric_list
 
 ##### Transform the categorical data by different encoding methods ###########
@@ -91,7 +137,7 @@ def run_model(categorical_method):
     split_datetime_col()
     
     # classify columns to categorical and numerical
-    numerical_features, categorical_features = classify_columns_statistically(threshold)
+    numerical_features, categorical_features = classify_columns_distribution(threshold)
     
     # impute and scaling numerical features
     numeric_transformer = Pipeline(steps=[
@@ -126,11 +172,15 @@ def run_model(categorical_method):
     
     # Fit Model
     classifier.fit(X_train, y_train)
-    return classifier.score(X_test, y_test)
-        
-
-classical_encoders = ['OneHotEncoder','BinaryEncoder', 'HashingEncoder']
+    #score = classifier.score(X_test, y_test)
+    return classifier
+       
+#classical_encoders = ['OneHotEncoder','BinaryEncoder', 'HashingEncoder']
+classical_encoders = ['HashingEncoder']
 for encoder in classical_encoders:
-    result = run_model(encoder)
-    print("Model Score with: " + encoder + " : %.3f" %  result)
-    print('--------------')
+   # result = run_model(encoder)
+   classifier = run_model(encoder)
+   coef= classifier.named_steps['classifier'].coef_
+   len(coef)
+  # print("Model Score with: " + encoder + " : %.3f" %  result)
+   # print('--------------')
