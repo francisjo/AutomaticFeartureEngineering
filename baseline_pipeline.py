@@ -26,7 +26,6 @@ df = pd.read_csv(titanic)
 threshold = 0.20
 targetLabel = 'Survived'
 
-
 # the main function to run the preprocessing phase and to fit the model to training data #
 def run_model(categorical_method):
     
@@ -35,7 +34,7 @@ def run_model(categorical_method):
     
     # classify columns to categorical and numerical
     numerical_features, categorical_features = cc.columns_distribution_classification(df, targetLabel)
-    
+
     # impute and scaling numerical features
     numeric_transformer = Pipeline(steps=[
         ('imputer', SimpleImputer(missing_values=np.NaN, strategy='mean', copy=False)),
