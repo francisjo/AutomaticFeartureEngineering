@@ -20,22 +20,31 @@ target_label = 'price'
 
 # load dataset into a pandas data-frame
 def load_data():
+
     titanic = 'https://raw.githubusercontent.com/nphardly/titanic/master/data/inputs/train.csv'
     heart = 'https://raw.githubusercontent.com/francisjo/AutomaticFeartureEngineering/master/Datasets/heart.csv'
     car = 'https://raw.githubusercontent.com/francisjo/AutomaticFeartureEngineering/master/Datasets/car_data.csv'
     wikipedia = 'https://raw.githubusercontent.com/francisjo/AutomaticFeartureEngineering/master/Datasets/smallwikipedia.csv'
 
-    df = pd.read_csv(car)
-    return df
+    df_titanic = pd.read_csv(titanic)
+    df_heart = pd.read_csv(heart)
+    df_car = pd.read_csv(car)
+    df_dict = {"titanic": df_titanic, "heart": df_heart, "car": df_car}
+    return df_dict
 
 
 # passing the data-frame to the run_model() function
 def main_func():
-    df = load_data()
-    result = run_model(df)
+    df_dict = load_data()
+    df = pd.DataFrame()
+
+    result = run_model1(df_dict)
     print("Model Score with: %.3f" % result)
 
-
+def run_model1(df_dict):
+    summarized_df_titanic = col_classify.get_summarized_df(df_dict)
+   # summarized_df_heart = col_classify.get_summarized_df(df_dict)
+   # summarized_df_df_car = col_classify.get_summarized_df(df_dict)
 # drop the target label from a list
 def drop_target_label(cols_list, target_label):
     for value in cols_list:
@@ -44,12 +53,12 @@ def drop_target_label(cols_list, target_label):
             break
     return cols_list
 
-
+'''
 # the main function to run the pre-processing phase and to fit the model to training data #
 def run_model(df):
 
     # split data-time column if exists
-    cd.split_datetime_col(df)
+    #cd.split_datetime_col(df)
     
     # classify columns to categorical and numerical
     summarized_df, numeric_cols, nominal_cols, ordinal_cols = col_classify.get_numeric_nominal_ordinal_cols(df)
@@ -117,5 +126,5 @@ def run_model(df):
     score = classifier.score(X_test, y_test)
     return score
 
-
+'''
 main_func()

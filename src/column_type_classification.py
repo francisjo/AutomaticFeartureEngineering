@@ -72,25 +72,146 @@ def get_column_type(df):
     return result
 
 
-def get_numeric_nominal_ordinal_cols(df):
-    summarized_df = get_summarized_df(df)
+def get_numeric_nominal_ordinal_cols(df_dict):
+    summarized_dfs = get_summarized_df(df_dict)
     summarized_df, numeric_cols, nominal_cols, ordinal_cols = final_cols_classification(summarized_df)
-    return summarized_df, numeric_cols, nominal_cols, ordinal_cols
+    return summarized_dfs, numeric_cols, nominal_cols, ordinal_cols
+
+def get_dataset_groundtruth():
+    dict_car = {"make": "nominal",
+            "fuel_type": "nominal",
+            "aspiration": "nominal",
+            "num_of_doors": "discrete",
+            "body_style": "nominal",
+            "drive_wheels": "nominal",
+            "engine_location": "binary",
+            "wheel_base": "continuous",
+            "length": "continuous",
+            "width": "continuous",
+            "height": "continuous",
+            "height": "continuous",
+            "engine_type": "nominal",
+            "num_of_cylinders": "discrete",
+            "engine_size": "continuous",
+            "fuel_system": "nominal",
+            "compression_ratio": "continuous",
+            "horsepower": "continuous",
+            "peak_rpm": "continuous",
+            "city_mpg": "continuous",
+            "highway_mpg": "continuous",
+            "price": "continuous"
+            }
+    dict_titanic = {"PassengerId": "discrete",
+                "Survived": "binary",
+                "Pclass": "ordinal",
+                "Name": "nominal",
+                "Sex": "binary",
+                "Age": "discrete",
+                "SibSp": "continuous",
+                "Parch": "discrete",
+                "Ticket": "nominal",
+                "Fare": "continuous",
+                "Cabin": "ordinal",
+                "Embarked": "nominal",
+                }
+    dict_heart = {"age":"discrete",
+                  "sex": "binary",
+                  "cp": "nominal",
+                  "trestbps": "continuous",
+                  "chol": "continuous",
+                  "fbs": "binary",
+                  "restecg": "nominal",
+                  "thalach": "continuous",
+                  "exang": "binary",
+                  "oldpeak": "continuous",
+                  "slope": "ordinal",
+                  "ca": "nominal",
+                  "thal": "ordinal",
+                  "target": "binary",
+                  }
+    return dict_car
 
 
-def get_summarized_df(df):
-    cols_type_dict = get_column_type(df)
-    encoded_df = encode_string_column(df)
-    cols_dist_dict = columns_distribution_classification(encoded_df)
-    cols_freq_dict = columns_frequency_classification(encoded_df)
-    cols_corr_dict_max = columns_correlation_classification_max(encoded_df)
-    cols_corr_dict_min = columns_correlation_classification_min(encoded_df)
+def get_summarized_df(df_dict):
+    dict_car = {"make": "nominal",
+                "fuel_type": "nominal",
+                "aspiration": "nominal",
+                "num_of_doors": "discrete",
+                "body_style": "nominal",
+                "drive_wheels": "nominal",
+                "engine_location": "binary",
+                "wheel_base": "continuous",
+                "length": "continuous",
+                "width": "continuous",
+                "height": "continuous",
+                "height": "continuous",
+                "engine_type": "nominal",
+                "num_of_cylinders": "discrete",
+                "engine_size": "continuous",
+                "fuel_system": "nominal",
+                "compression_ratio": "continuous",
+                "horsepower": "continuous",
+                "peak_rpm": "continuous",
+                "city_mpg": "continuous",
+                "highway_mpg": "continuous",
+                "price": "continuous"
+                }
+    dict_titanic = {"PassengerId": "discrete",
+                    "Survived": "binary",
+                    "Pclass": "ordinal",
+                    "Name": "nominal",
+                    "Sex": "binary",
+                    "Age": "discrete",
+                    "SibSp": "continuous",
+                    "Parch": "discrete",
+                    "Ticket": "nominal",
+                    "Fare": "continuous",
+                    "Cabin": "ordinal",
+                    "Embarked": "nominal",
+                    }
+    dict_heart = {"age": "discrete",
+                  "sex": "binary",
+                  "cp": "nominal",
+                  "trestbps": "continuous",
+                  "chol": "continuous",
+                  "fbs": "binary",
+                  "restecg": "nominal",
+                  "thalach": "continuous",
+                  "exang": "binary",
+                  "oldpeak": "continuous",
+                  "slope": "ordinal",
+                  "ca": "nominal",
+                  "thal": "ordinal",
+                  "target": "binary",
+                  }
+    summarized_dfs = pd.DataFrame()
+    for item, value in df_dict.items():
+        cols_type_dict = get_column_type(value)
+        encoded_df = encode_string_column(value)
+        cols_dist_dict = columns_distribution_classification(encoded_df)
+        cols_freq_dict = columns_frequency_classification(encoded_df)
+        cols_corr_dict_max = columns_correlation_classification_max(encoded_df)
+        cols_corr_dict_min = columns_correlation_classification_min(encoded_df)
+        df_dicts = [cols_dist_dict, cols_freq_dict, cols_corr_dict_min, cols_corr_dict_max, cols_type_dict, {}]
+        summarized_df = pd.DataFrame(df_dicts)
+        summarized_df["Method"] = ["Dist", "Freq", "Corr_Min", "Corr_Max", "D-Type", "Cls-Result"]
+        summarized_df = summarized_df.set_index("Method")
+        summarized_df_T = summarized_df.T.reset_index()
+        if item == "titanic":
+            for col_name in summarized_df_T['index']:
+                result = dict_titanic.get(col_name)
+                summarized_df_T[summarized_df_T["index"] == col_name, "Cls-Result"] = result
+        elif item == "heart":
+            for col_name in summarized_df_T['index']:
+                result = dict_heart.get(col_name)
+                summarized_df_T[summarized_df_T["index"] == col_name, "Cls-Result"] = result
+        elif item == "car":
+            for col_name in summarized_df_T['index']:
+                result = dict_car.get(col_name)
+                summarized_df_T[summarized_df_T["index"] == col_name, "Cls-Result"] = result
+        summarized_dfs = pd.concat([summarized_dfs,summarized_df_T])
 
-    df_dicts = [cols_dist_dict, cols_freq_dict, cols_corr_dict_min, cols_corr_dict_max, cols_type_dict, {}]
-    summarized_df = pd.DataFrame(df_dicts)
-    summarized_df["Method"] = ["Dist", "Freq", "Corr_Min", "Corr_Max", "D-Type", "Cls-Result"]
-    summarized_df.set_index('Method', inplace=True)
-    return summarized_df
+    return summarized_dfs
 
 
 def get_freq(summarized_df, col, threshold_freq):
