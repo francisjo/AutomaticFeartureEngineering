@@ -2,15 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="8036ce64-f2b4-445a-af0e-ee668e6549e1" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/AutomaticFeartureEngineering.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/libraries/R_User_Library.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/test.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Datasets/car_data.csv" beforeDir="false" afterPath="$PROJECT_DIR$/Datasets/car_data.csv" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/baseline_pipeline.py" beforeDir="false" afterPath="$PROJECT_DIR$/baseline_pipeline.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/column_type_classification.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/column_type_classification.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/statistical_functions.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/statistical_functions.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/test.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -19,17 +14,33 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="FileEditorManager">
-    <leaf>
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/baseline_pipeline.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="781">
-              <caret line="83" selection-start-line="83" selection-end-line="83" />
+            <state relative-caret-position="476">
+              <caret line="28" selection-start-line="28" selection-end-line="32" selection-end-column="90" />
               <folding>
                 <element signature="e#0#19#0" expanded="true" />
-                <element signature="e#1710#1842#0" />
-                <element signature="e#1844#3993#1" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://D:/Anaconda3/Lib/site-packages/pydotplus/graphviz.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="130">
+              <caret line="1959" selection-start-line="1959" selection-end-line="1959" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://D:/Anaconda3/Lib/site-packages/sklearn/utils/validation.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="211">
+              <caret line="55" selection-start-line="55" selection-end-line="55" />
             </state>
           </provider>
         </entry>
@@ -37,21 +48,35 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/column_type_classification.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-1701">
-              <caret line="57" selection-start-line="57" selection-end-line="57" />
+            <state relative-caret-position="459">
+              <caret line="117" column="76" selection-start-line="117" selection-start-column="76" selection-end-line="117" selection-end-column="76" />
               <folding>
                 <element signature="e#0#33#0" expanded="true" />
-                <element signature="e#3000#3845#0" />
-                <element signature="e#3865#4314#0" />
-                <element signature="e#4332#4870#0" />
-                <element signature="e#5268#5912#0" />
-                <element signature="e#5908#6842#0" />
-                <element signature="e#5938#6435#0" />
-                <element signature="e#6453#6992#0" />
-                <element signature="e#9065#9209#0" />
-                <element signature="e#9266#9411#0" />
-                <element signature="e#9472#9750#0" />
-                <element signature="e#9803#12338#0" />
+                <element signature="e#215#861#0" />
+                <element signature="e#877#1811#0" />
+                <element signature="e#1831#2328#0" />
+                <element signature="e#2346#2885#0" />
+                <element signature="e#5385#5580#0" />
+                <element signature="e#5617#6004#0" />
+                <element signature="e#6036#6128#0" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/statistical_functions.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="118">
+              <caret line="83" column="76" selection-start-line="83" selection-start-column="76" selection-end-line="83" selection-end-column="76" />
+              <folding>
+                <element signature="e#0#27#0" expanded="true" />
+                <element signature="e#222#460#0" />
+                <element signature="e#607#846#0" />
+                <element signature="e#995#1566#0" />
+                <element signature="e#1717#2414#0" />
+                <element signature="e#2544#2737#0" />
+                <element signature="e#2874#3112#0" />
               </folding>
             </state>
           </provider>
@@ -60,20 +85,11 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/test.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="152">
-              <caret line="28" selection-start-line="28" selection-end-line="46" selection-end-column="17" />
+            <state relative-caret-position="410">
+              <caret line="53" selection-start-line="53" selection-end-line="53" />
               <folding>
                 <element signature="e#0#18#0" expanded="true" />
               </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$APPLICATION_HOME_DIR$/helpers/pydev/_pydev_imps/_pydev_execfile.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="289">
-              <caret line="17" selection-start-line="17" selection-end-line="17" />
             </state>
           </provider>
         </entry>
@@ -94,14 +110,15 @@
     <option name="CHANGED_PATHS">
       <list>
         <option value="$PROJECT_DIR$/src/test.py" />
+        <option value="$PROJECT_DIR$/src/statistical_functions.py" />
         <option value="$PROJECT_DIR$/src/column_type_classification.py" />
         <option value="$PROJECT_DIR$/baseline_pipeline.py" />
       </list>
     </option>
   </component>
-  <component name="ProjectFrameBounds" extendedState="7">
-    <option name="x" value="10" />
-    <option name="y" value="20" />
+  <component name="ProjectFrameBounds" extendedState="6">
+    <option name="x" value="13" />
+    <option name="y" value="23" />
     <option name="width" value="1346" />
     <option name="height" value="688" />
   </component>
@@ -138,6 +155,9 @@
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="node.js.detected.package.eslint" value="true" />
+    <property name="node.js.path.for.package.eslint" value="project" />
+    <property name="node.js.selected.package.eslint" value="(autodetect)" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
     <property name="settings.editor.selected.configurable" value="preferences.lookFeel" />
@@ -240,11 +260,12 @@
       <option name="presentableId" value="Default" />
       <updated>1557343827232</updated>
       <workItem from="1557343830622" duration="35391000" />
+      <workItem from="1557509465889" duration="15328000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="35391000" />
+    <option name="totallyTimeSpent" value="50719000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -256,32 +277,58 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="-8" y="-8" width="1936" height="1056" extended-state="7" />
+    <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
+    <editor active="true" />
     <layout>
-      <window_info id="Favorites" side_tool="true" />
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.17537314" />
+      <window_info content_ui="combo" id="Project" order="0" weight="0.17697228" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
-      <window_info anchor="bottom" id="Docker" show_stripe_button="false" />
-      <window_info anchor="bottom" id="Database Changes" />
-      <window_info anchor="bottom" id="Version Control" weight="0.3289689" />
-      <window_info anchor="bottom" id="Python Console" weight="0.3289689" />
-      <window_info anchor="bottom" id="Terminal" weight="0.3289689" />
-      <window_info anchor="bottom" id="Event Log" side_tool="true" />
+      <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info anchor="bottom" id="Run" order="2" weight="0.3289689" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.32827735" />
       <window_info active="true" anchor="bottom" id="Debug" order="3" visible="true" weight="0.28602383" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" weight="0.3289689" />
-      <window_info anchor="right" id="Database" />
-      <window_info anchor="right" id="R Packages" />
-      <window_info anchor="right" id="SciView" visible="true" weight="0.7436034" />
-      <window_info anchor="right" id="R Graphics" />
+      <window_info anchor="bottom" id="Docker" order="7" show_stripe_button="false" />
+      <window_info anchor="bottom" id="Version Control" order="8" weight="0.3289689" />
+      <window_info anchor="bottom" id="Database Changes" order="9" />
+      <window_info anchor="bottom" id="Event Log" order="10" side_tool="true" />
+      <window_info anchor="bottom" id="Terminal" order="11" weight="0.3289689" />
+      <window_info anchor="bottom" id="Python Console" order="12" weight="0.3289689" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
+      <window_info anchor="right" id="SciView" order="3" visible="true" weight="0.37846482" />
+      <window_info anchor="right" id="R Graphics" order="4" weight="0.32995737" />
+      <window_info anchor="right" id="R Packages" order="5" />
+      <window_info anchor="right" id="Database" order="6" />
     </layout>
+    <layout-to-restore>
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.17697228" />
+      <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
+      <window_info id="Favorites" order="2" side_tool="true" />
+      <window_info anchor="bottom" id="Message" order="0" />
+      <window_info anchor="bottom" id="Find" order="1" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.32827735" />
+      <window_info active="true" anchor="bottom" id="Debug" order="3" visible="true" weight="0.28602383" />
+      <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
+      <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
+      <window_info anchor="bottom" id="TODO" order="6" weight="0.3289689" />
+      <window_info anchor="bottom" id="Docker" order="7" show_stripe_button="false" />
+      <window_info anchor="bottom" id="Version Control" order="8" weight="0.3289689" />
+      <window_info anchor="bottom" id="Database Changes" order="9" />
+      <window_info anchor="bottom" id="Event Log" order="10" side_tool="true" />
+      <window_info anchor="bottom" id="Terminal" order="11" weight="0.3289689" />
+      <window_info anchor="bottom" id="Python Console" order="12" weight="0.3289689" />
+      <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
+      <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
+      <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
+      <window_info anchor="right" id="SciView" order="3" visible="true" weight="0.3651386" />
+      <window_info anchor="right" id="R Graphics" order="4" weight="0.32995737" />
+      <window_info anchor="right" id="R Packages" order="5" />
+      <window_info anchor="right" id="Database" order="6" />
+    </layout-to-restore>
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="1" />
@@ -311,22 +358,25 @@
         </entry>
       </map>
     </option>
-  </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/baseline_pipeline.py</url>
-          <line>83</line>
-          <option name="timeStamp" value="31" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
+    <option name="RECENT_FILTERS">
+      <map>
+        <entry key="Branch">
+          <value>
+            <list />
+          </value>
+        </entry>
+        <entry key="User">
+          <value>
+            <list />
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/AutomaticFeartureEngineering$baseline_pipeline.coverage" NAME="baseline_pipeline Coverage Results" MODIFIED="1557477795855" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/AutomaticFeartureEngineering$baseline_pipeline.coverage" NAME="baseline_pipeline Coverage Results" MODIFIED="1557525625344" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/AutomaticFeartureEngineering$column_type_classification.coverage" NAME="column_type_classification Coverage Results" MODIFIED="1557411588083" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src" />
-    <SUITE FILE_PATH="coverage/AutomaticFeartureEngineering$test.coverage" NAME="test Coverage Results" MODIFIED="1557477106043" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src" />
+    <SUITE FILE_PATH="coverage/AutomaticFeartureEngineering$test.coverage" NAME="test Coverage Results" MODIFIED="1557519424169" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src" />
   </component>
   <component name="debuggerHistoryManager">
     <expressions id="evaluateExpression">
@@ -359,13 +409,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://D:/Anaconda3/Lib/urllib/request.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="168">
-          <caret line="1386" selection-start-line="1386" selection-end-line="1386" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://D:/Anaconda3/Lib/site-packages/numpy/core/numeric.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="358">
@@ -394,19 +437,8 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/iris">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/t.png">
-      <provider selected="true" editor-type-id="images" />
-    </entry>
-    <entry file="file://D:/Anaconda3/Lib/site-packages/pydotplus/graphviz.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="130">
-          <caret line="1959" selection-start-line="1959" selection-end-line="1959" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/iris" />
+    <entry file="file://$PROJECT_DIR$/t.png" />
     <entry file="file://D:/Anaconda3/Lib/site-packages/pandas/core/generic.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="107">
@@ -421,13 +453,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$APPLICATION_HOME_DIR$/helpers/pydev/_pydev_imps/_pydev_execfile.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="289">
-          <caret line="17" selection-start-line="17" selection-end-line="17" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://D:/Anaconda3/Lib/site-packages/pandas/core/reshape/concat.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="823">
@@ -435,45 +460,99 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$APPLICATION_HOME_DIR$/helpers/pydev/_pydev_imps/_pydev_execfile.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="289">
+          <caret line="17" selection-start-line="17" selection-end-line="17" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://D:/Anaconda3/Lib/site-packages/pandas/core/frame.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="17">
+          <caret line="2926" selection-start-line="2926" selection-end-line="2926" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://D:/Anaconda3/Lib/urllib/request.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="168">
+          <caret line="1386" selection-start-line="1386" selection-end-line="1386" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/data_cleaning.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <folding>
+            <element signature="e#0#33#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/test.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="152">
-          <caret line="28" selection-start-line="28" selection-end-line="46" selection-end-column="17" />
+        <state relative-caret-position="410">
+          <caret line="53" selection-start-line="53" selection-end-line="53" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
+    <entry file="file://D:/Anaconda3/Lib/site-packages/pydotplus/graphviz.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="130">
+          <caret line="1959" selection-start-line="1959" selection-end-line="1959" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/statistical_functions.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="118">
+          <caret line="83" column="76" selection-start-line="83" selection-start-column="76" selection-end-line="83" selection-end-column="76" />
+          <folding>
+            <element signature="e#0#27#0" expanded="true" />
+            <element signature="e#222#460#0" />
+            <element signature="e#607#846#0" />
+            <element signature="e#995#1566#0" />
+            <element signature="e#1717#2414#0" />
+            <element signature="e#2544#2737#0" />
+            <element signature="e#2874#3112#0" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://D:/Anaconda3/Lib/site-packages/sklearn/utils/validation.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="211">
+          <caret line="55" selection-start-line="55" selection-end-line="55" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/column_type_classification.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-1701">
-          <caret line="57" selection-start-line="57" selection-end-line="57" />
+        <state relative-caret-position="459">
+          <caret line="117" column="76" selection-start-line="117" selection-start-column="76" selection-end-line="117" selection-end-column="76" />
           <folding>
             <element signature="e#0#33#0" expanded="true" />
-            <element signature="e#3000#3845#0" />
-            <element signature="e#3865#4314#0" />
-            <element signature="e#4332#4870#0" />
-            <element signature="e#5268#5912#0" />
-            <element signature="e#5908#6842#0" />
-            <element signature="e#5938#6435#0" />
-            <element signature="e#6453#6992#0" />
-            <element signature="e#9065#9209#0" />
-            <element signature="e#9266#9411#0" />
-            <element signature="e#9472#9750#0" />
-            <element signature="e#9803#12338#0" />
+            <element signature="e#215#861#0" />
+            <element signature="e#877#1811#0" />
+            <element signature="e#1831#2328#0" />
+            <element signature="e#2346#2885#0" />
+            <element signature="e#5385#5580#0" />
+            <element signature="e#5617#6004#0" />
+            <element signature="e#6036#6128#0" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/baseline_pipeline.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="781">
-          <caret line="83" selection-start-line="83" selection-end-line="83" />
+        <state relative-caret-position="476">
+          <caret line="28" selection-start-line="28" selection-end-line="32" selection-end-column="90" />
           <folding>
             <element signature="e#0#19#0" expanded="true" />
-            <element signature="e#1710#1842#0" />
-            <element signature="e#1844#3993#1" />
           </folding>
         </state>
       </provider>

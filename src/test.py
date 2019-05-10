@@ -21,11 +21,47 @@ else:
 '''
 
 
+
+def columns_correlation_chi2(df):
+    result_isdependent = {}
+    result_critical = {}
+    result_stat = {}
+    result_dof = {}
+    for col1 in df.columns:
+        chi2_values = pd.DataFrame()
+        for col2 in df.columns:
+            if col1 != col2:
+                crosstab = pd.crosstab(df[col1], df[col2])
+                stat, p, dof, expected = chi2_contingency(crosstab)
+                prob = 0.95
+                critical = chi2.ppf(prob, dof)
+                if abs(stat) >= critical:
+                    chi2_values[col2] = [1, critical, stat, dof]
+                else:
+                    chi2_values[col2] = [0, critical, stat, dof]
+        chi2_values_T = chi2_values.T
+        dependent_min = chi2_values_T[chi2_values_T[0] == 1].groupby(chi2_values_T[0]).min()
+        if len(dependent_min) != 0:
+            print(type(dependent_min))
+            result_isdependent[col1] = dependent_min[0]
+            result_critical[col1] = dependent_min[1]
+            result_stat[col1] = dependent_min[2]
+            result_dof[col1] = dependent_min[3]
+        else:
+            print(type(dependent_min))
+            independent_min = chi2_values_T[chi2_values_T[0] == 0].groupby(chi2_values_T[0]).min()
+            result_isdependent[col1] = independent_min[0]
+            result_critical[col1] = independent_min[1]
+            result_stat[col1] = independent_min[2]
+            result_dof[col1] = independent_min[3]
+
+    return result_isdependent, result_critical, result_stat, result_dof
+
+
 dff = df[['Name', 'Sex', 'Age']].copy()
-
-
-
-
+result_isdependent, result_critical, result_stat, result_dof = columns_correlation_chi2(dff)
+x=1
+'''
 def columns_correlation_spearmanr(df):
     result = {}
     for col1 in df.columns:
@@ -50,7 +86,7 @@ def columns_correlation_spearmanr(df):
 result = columns_correlation_spearmanr(dff)
 
 print(result)
-
+'''
 
 
 

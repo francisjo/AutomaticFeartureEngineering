@@ -30,7 +30,7 @@ def load_data_local():
     titanic = 'C:\\Users\\Joseph Francis\\AutomaticFeartureEngineering\\Datasets\\train.csv'
     car = 'C:\\Users\\Joseph Francis\\AutomaticFeartureEngineering\\Datasets\\car.csv'
     adult = 'C:\\Users\\Joseph Francis\\AutomaticFeartureEngineering\\Datasets\\adult.csv'
-    heart = 'C:\\Users\\Joseph Francis\\AutomaticFeartureEngineering\\Datasets\\adult.csv'
+    heart = 'C:\\Users\\Joseph Francis\\AutomaticFeartureEngineering\\Datasets\\heart.csv'
     df_titanic = pd.read_csv(titanic)
     df_car = pd.read_csv(car)
     df_adult = pd.read_csv(adult)
@@ -47,15 +47,15 @@ def run_model_tree(df):
     y = df["Cls-Result"]
 
     # Split Data to Train and Test Data
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.35, random_state=5)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.30, random_state=5)
 
     # test= run_model1(df_heart_dict).set_index("index")
     # X_test = test.drop("Cls-Result", axis=1)
     # y_test = test["Cls-Result"]
 
     # Fit Model
-    clf = tree.DecisionTreeClassifier(criterion="entropy", max_depth=3)
-    clf = clf.fit(X_train, y_train)
+    clf = tree.DecisionTreeClassifier(criterion="entropy", random_state=3)
+    clf.fit(X_train, y_train)
     y_predict = clf.predict(X_test)
     score = clf.score(X_test, y_test)
     print("------Classification Report-------")
@@ -67,10 +67,10 @@ def run_model_tree(df):
     print("------K-Fold Cross Validation-------")
     print("Cross-Validation Accuracies:  ", accuracies)
     print("Cross-Validation Mean Accuracy =  ", accuracies.mean())
-
-    #======== draw DT ===========
+    # ======== Plot Decision Tree ===========
     dot_data = StringIO()
     export_graphviz(clf, out_file=dot_data,
+                    feature_names=X.columns,
                     filled=True, rounded=True,
                     special_characters=True)
     graph = pydotplus.graph_from_dot_data(dot_data.getvalue())

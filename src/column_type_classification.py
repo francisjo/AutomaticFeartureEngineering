@@ -86,9 +86,10 @@ def get_summarized_df(df_dict):
         cols_corr_dict_strong = sf.columns_correlation_classification_strong(encoded_df)
         cols_spearman_dict_strong = sf.columns_correlation_spearman_r(encoded_df)
         cols_isbinary = column_is_binary(encoded_df)
-        df_dicts = [cols_dist_dict, cols_freq_dict, cols_corr_dict_min, cols_corr_dict_max, cols_corr_dict_strong, cols_spearman_dict_strong, cols_isbinary, cols_type_dict, {}]
+        cols_isdependent,cols_critical,cols_stat,cols_dof = sf.columns_correlation_chi2(encoded_df)
+        df_dicts = [cols_dist_dict, cols_freq_dict, cols_corr_dict_min, cols_corr_dict_max, cols_corr_dict_strong, cols_spearman_dict_strong,cols_isdependent,cols_critical,cols_stat,cols_dof, cols_isbinary, cols_type_dict, {}]
         summarized_df = pd.DataFrame(df_dicts)
-        summarized_df["Method"] = ["Dist", "Freq", "Corr_Min", "Corr_Max", "Corr_Strong", "Corr_Spearman", "Is_binary", "D-Type", "Cls-Result"]
+        summarized_df["Method"] = ["Dist", "Freq", "Corr_Min", "Corr_Max", "Corr_Strong", "Corr_Spearman", "chi2_isdependent", "chi2_critical", "chi2_stat", "chi2_dof", "Is_binary", "D-Type", "Cls-Result"]
         summarized_df = summarized_df.set_index("Method")
         summarized_df_T = summarized_df.T.reset_index()
         if item == "titanic":
@@ -111,7 +112,10 @@ def get_summarized_df(df_dict):
     le = LabelEncoder()
     summarized_dfs["Cls-Result"] = le.fit_transform(summarized_dfs["Cls-Result"])
     summarized_dfs["D-Type"] = le.fit_transform(summarized_dfs["D-Type"])
-    summarized_dfs = summarized_dfs.drop(["Corr_Min", "Corr_Max"], axis=1)
+    one_hot = pd.get_dummies(summarized_dfs['D-Type'])
+    summarized_dfs = summarized_dfs.drop('D-Type', axis=1)
+    summarized_dfs = summarized_dfs.join(one_hot)
+    # summarized_dfs = summarized_dfs.drop(["Corr_Min", "Corr_Max"], axis=1))
     return summarized_dfs
 
 
