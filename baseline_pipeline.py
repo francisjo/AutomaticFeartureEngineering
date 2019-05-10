@@ -1,6 +1,7 @@
 import pandas as pd
 
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, cross_val_score
+from sklearn.metrics import classification_report
 from sklearn import tree
 
 import column_type_classification as col_classify
@@ -29,7 +30,7 @@ def load_data_local():
     df_car = pd.read_csv(car)
     df_adult = pd.read_csv(adult)
     df_heart = pd.read_csv(heart)
-    df_dict = {"titanic": df_titanic, "car": df_car, "adult": df_adult, "heart": df_heart}
+    df_dict = {"titanic": df_titanic, "car": df_car, "adult": df_adult} #, "heart": df_heart
     return df_dict
 
 
@@ -41,7 +42,7 @@ def run_model_tree(df):
     y = df["Cls-Result"]
 
     # Split Data to Train and Test Data
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.30, random_state=42)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.35, random_state=5)
 
     # test= run_model1(df_heart_dict).set_index("index")
     # X_test = test.drop("Cls-Result", axis=1)
@@ -50,13 +51,17 @@ def run_model_tree(df):
     # Fit Model
     clf = tree.DecisionTreeClassifier()
     clf = clf.fit(X_train, y_train)
-    predict = clf.predict(X_test)
+    y_predict = clf.predict(X_test)
     score = clf.score(X_test, y_test)
+    print("------Classification Report-------")
+    print(classification_report(y_test, y_predict))
     print("Decision Tree Score: ", score)
-    print("------Prediction Result-------")
-    print(predict)
-    print("------Old Correct Labels-------")
-    print(y_test)
+
+    # Applying K-Fold Cross Validation
+    accuracies = cross_val_score(estimator=clf, X=X_train, y=y_train, cv=4)
+    print("------K-Fold Cross Validation-------")
+    print("Cross-Validation Accuracies:  ", accuracies)
+    print("Cross-Validation Mean Accuracy =  ", accuracies.mean())
 
 
 # passing the data-frame to the run_model() function
