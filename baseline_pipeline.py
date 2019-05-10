@@ -6,6 +6,11 @@ from sklearn import tree
 
 import column_type_classification as col_classify
 
+from sklearn.tree import export_graphviz
+from sklearn.externals.six import StringIO
+from IPython.display import Image
+import pydotplus
+
 
 # load dataset into a pandas data-frame
 def load_data_online():
@@ -17,7 +22,7 @@ def load_data_online():
     df_car = pd.read_csv(car)
     df_adult = pd.read_csv(adult)
     df_heart = pd.read_csv(heart)
-    df_dict = {"titanic": df_titanic, "car": df_car, "adult": df_adult, "heart": df_heart}
+    df_dict = {"titanic": df_titanic, "car": df_car, "adult": df_adult} #, "heart": df_heart
     return df_dict
 
 
@@ -49,7 +54,7 @@ def run_model_tree(df):
     # y_test = test["Cls-Result"]
 
     # Fit Model
-    clf = tree.DecisionTreeClassifier()
+    clf = tree.DecisionTreeClassifier(criterion="entropy", max_depth=3)
     clf = clf.fit(X_train, y_train)
     y_predict = clf.predict(X_test)
     score = clf.score(X_test, y_test)
@@ -62,6 +67,15 @@ def run_model_tree(df):
     print("------K-Fold Cross Validation-------")
     print("Cross-Validation Accuracies:  ", accuracies)
     print("Cross-Validation Mean Accuracy =  ", accuracies.mean())
+
+    #======== draw DT ===========
+    dot_data = StringIO()
+    export_graphviz(clf, out_file=dot_data,
+                    filled=True, rounded=True,
+                    special_characters=True)
+    graph = pydotplus.graph_from_dot_data(dot_data.getvalue())
+    graph.write_png('tree.png')
+    Image(graph.create_png())
 
 
 # passing the data-frame to the run_model() function
