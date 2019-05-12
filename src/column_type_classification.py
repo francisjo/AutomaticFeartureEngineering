@@ -1,80 +1,13 @@
 import pandas.api.types as ptypes
 import pandas as pd
 from sklearn.preprocessing import LabelEncoder
+import category_encoders as ce
 
 import data_cleaning as cd
 import statistical_functions as sf
 
 
 def get_summarized_df(df_dict):
-    dict_adult = {"age": "discrete",
-                  "workclass": "nominal",
-                  "fnlwgt": "continuous",
-                  "education": "ordinal",
-                  "education-num": "ordinal",
-                  "marital-status": "nominal",
-                  "occupation": "nominal",
-                  "relationship": "nominal",
-                  "race": "nominal",
-                  "sex": "binary",
-                  "capital-gain": "continuous",
-                  "capital-loss": "continuous",
-                  "hours-per-week": "discrete",
-                  "native-country": "nominal",
-                  "class": "binary",
-                  }
-    dict_car = {"make": "nominal",
-                "fuel_type": "binary",
-                "aspiration": "binary",
-                "num_of_doors": "discrete",
-                "body_style": "nominal",
-                "drive_wheels": "binary",
-                "engine_location": "binary",
-                "wheel_base": "continuous",
-                "length": "continuous",
-                "width": "continuous",
-                "height": "continuous",
-                "engine_type": "nominal",
-                "num_of_cylinders": "ordinal",
-                "engine_size": "continuous",
-                "fuel_system": "nominal",
-                "compression_ratio": "continuous",
-                "horsepower": "continuous",
-                "peak_rpm": "continuous",
-                "city_mpg": "continuous",
-                "highway_mpg": "continuous",
-                "price": "continuous",
-                "curb_weight": "continuous"
-                }
-    dict_titanic = {"PassengerId": "discrete",
-                    "Survived": "binary",
-                    "Pclass": "ordinal",
-                    "Name": "nominal",
-                    "Sex": "binary",
-                    "Age": "discrete",
-                    "SibSp": "continuous",
-                    "Parch": "discrete",
-                    "Ticket": "nominal",
-                    "Fare": "continuous",
-                    "Cabin": "ordinal",
-                    "Embarked": "nominal",
-                    }
-    dict_heart = {"age": "discrete",
-                  "sex": "binary",
-                  "cp": "nominal",
-                  "trestbps": "continuous",
-                  "chol": "continuous",
-                  "fbs": "binary",
-                  "restecg": "nominal",
-                  "thalach": "continuous",
-                  "exang": "binary",
-                  "oldpeak": "continuous",
-                  "slope": "ordinal",
-                  "ca": "nominal",
-                  "thal": "ordinal",
-                  "target": "binary",
-                  }
-
     summarized_dfs = pd.DataFrame()
     for item, value in df_dict.items():
         cols_type_dict = get_column_type(value)
@@ -84,39 +17,125 @@ def get_summarized_df(df_dict):
         cols_corr_dict_max = sf.columns_correlation_classification_max(encoded_df)
         cols_corr_dict_min = sf.columns_correlation_classification_min(encoded_df)
         cols_corr_dict_strong = sf.columns_correlation_classification_strong(encoded_df)
-        cols_spearman_dict_strong = sf.columns_correlation_spearman_r(encoded_df)
+        # cols_spearman_dict = sf.columns_correlation_spearman_r(encoded_df)
         cols_isbinary = column_is_binary(encoded_df)
-        cols_isdependent,cols_critical,cols_stat,cols_dof = sf.columns_correlation_chi2(encoded_df)
-        df_dicts = [cols_dist_dict, cols_freq_dict, cols_corr_dict_min, cols_corr_dict_max, cols_corr_dict_strong, cols_spearman_dict_strong,cols_isdependent,cols_critical,cols_stat,cols_dof, cols_isbinary, cols_type_dict, {}]
+        # cols_is_dependent,cols_critical,cols_stat,cols_dof = sf.columns_correlation_chi2(encoded_df)
+        df_dicts = [cols_dist_dict, cols_freq_dict, cols_corr_dict_min, cols_corr_dict_max, cols_corr_dict_strong, cols_isbinary, cols_type_dict, {}]
         summarized_df = pd.DataFrame(df_dicts)
-        summarized_df["Method"] = ["Dist", "Freq", "Corr_Min", "Corr_Max", "Corr_Strong", "Corr_Spearman", "chi2_isdependent", "chi2_critical", "chi2_stat", "chi2_dof", "Is_binary", "D-Type", "Cls-Result"]
+        summarized_df["Method"] = ["Dist", "Freq", "Corr_Min", "Corr_Max", "Corr_Strong", "Is_binary", "D-Type", "Cls-Result"]
         summarized_df = summarized_df.set_index("Method")
         summarized_df_T = summarized_df.T.reset_index()
-        if item == "titanic":
-            for col_name in summarized_df_T['index']:
-                result = dict_titanic.get(col_name)
-                summarized_df_T.loc[summarized_df_T["index"] == col_name, "Cls-Result"] = result
-        elif item == "heart":
-            for col_name in summarized_df_T['index']:
-                result = dict_heart.get(col_name)
-                summarized_df_T.loc[summarized_df_T["index"] == col_name, "Cls-Result"] = result
-        elif item == "car":
-            for col_name in summarized_df_T['index']:
-                result = dict_car.get(col_name)
-                summarized_df_T.loc[summarized_df_T["index"] == col_name, "Cls-Result"] = result
-        elif item == "adult":
-            for col_name in summarized_df_T['index']:
-                result = dict_adult.get(col_name)
-                summarized_df_T.loc[summarized_df_T["index"] == col_name, "Cls-Result"] = result
-        summarized_dfs = pd.concat([summarized_dfs,summarized_df_T])
-    le = LabelEncoder()
-    summarized_dfs["Cls-Result"] = le.fit_transform(summarized_dfs["Cls-Result"])
-    summarized_dfs["D-Type"] = le.fit_transform(summarized_dfs["D-Type"])
-    one_hot = pd.get_dummies(summarized_dfs['D-Type'])
-    summarized_dfs = summarized_dfs.drop('D-Type', axis=1)
-    summarized_dfs = summarized_dfs.join(one_hot)
+        get_ground_truth(summarized_df_T, item)
+        summarized_dfs = pd.concat([summarized_dfs, summarized_df_T])
+
+    cls_result_replace_map = {"Binary": 0, "Continuous": 1, "Discrete": 2, "Nominal": 3, "Ordinal": 4}
+    summarized_dfs["Cls-Result"].replace(cls_result_replace_map, inplace=True)
+    dtype_replace_map = {"bool": 0, "object": 1, "int64": 2, "float64": 3, "datetime64": 4}
+    summarized_dfs["D-Type"].replace(dtype_replace_map, inplace=True)
+    # one_hot = pd.get_dummies(summarized_dfs['D-Type'])
+    # summarized_dfs = summarized_dfs.drop('D-Type', axis=1)
+    # summarized_dfs = summarized_dfs.join(one_hot)
     # summarized_dfs = summarized_dfs.drop(["Corr_Min", "Corr_Max"], axis=1))
     return summarized_dfs
+
+
+def get_ground_truth(summarized_df_T, item):
+    groundtruth_dict = {
+        "adult":
+             {
+                 "age": "Discrete",
+                  "workclass": "Nominal",
+                  "fnlwgt": "Continuous",
+                  "education": "Ordinal",
+                  "education-num": "Ordinal",
+                  "marital-status": "Nominal",
+                  "occupation": "Nominal",
+                  "relationship": "Nominal",
+                  "race": "Nominal",
+                  "sex": "Binary",
+                  "capital-gain": "Continuous",
+                  "capital-loss": "Continuous",
+                  "hours-per-week": "Discrete",
+                  "native-country": "Nominal",
+                  "class": "Binary",
+             },
+         "car":
+             {
+                "make": "Nominal",
+                "fuel_type": "Binary",
+                "aspiration": "Binary",
+                "num_of_doors": "Discrete",
+                "body_style": "Nominal",
+                "drive_wheels": "Binary",
+                "engine_location": "Binary",
+                "wheel_base": "Continuous",
+                "length": "Continuous",
+                "width": "Continuous",
+                "height": "Continuous",
+                "engine_type": "Nominal",
+                "num_of_cylinders": "Ordinal",
+                "engine_size": "Continuous",
+                "fuel_system": "Nominal",
+                "compression_ratio": "Continuous",
+                "horsepower": "Continuous",
+                "peak_rpm": "Continuous",
+                "city_mpg": "Continuous",
+                "highway_mpg": "Continuous",
+                "price": "Continuous",
+                "curb_weight": "Continuous"
+             },
+         "titanic":
+             {
+                "PassengerId": "Discrete",
+                "Survived": "Binary",
+                "Pclass": "Ordinal",
+                "Name": "Nominal",
+                "Sex": "Binary",
+                "Age": "Discrete",
+                "SibSp": "Continuous",
+                "Parch": "Discrete",
+                "Ticket": "Nominal",
+                "Fare": "Continuous",
+                "Cabin": "Ordinal",
+                "Embarked": "Nominal",
+             },
+         "bridges":
+             {
+                "IDENTIF": "Nominal",
+                "RIVER": "Nominal",
+                "LOCATION": "Nominal",
+                "ERECTED": "Discrete",
+                "PURPOSE": "Nominal",
+                "LENGTH": "Continuous",
+                "LANES": "Discrete",
+                "CLEAR-G": "Binary",
+                "T-OR-D": "Binary",
+                "MATERIAL": "Nominal",
+                "SPAN": "Ordinal",
+                "REL-L": "Nominal",
+                "binaryClass": "Binary"
+             },
+         "heart":
+             {
+                "age": "Discrete",
+                "sex": "Binary",
+                "cp": "Nominal",
+                "trestbps": "Continuous",
+                "chol": "Continuous",
+                "fbs": "Binary",
+                "restecg": "Nominal",
+                "thalach": "Continuous",
+                "exang": "Binary",
+                "oldpeak": "Continuous",
+                "slope": "Ordinal",
+                "ca": "Nominal",
+                "thal": "Ordinal",
+                "target": "Binary",
+             }
+    }
+    for col_name in summarized_df_T['index']:
+        result = groundtruth_dict[item].get(col_name)
+        summarized_df_T.loc[summarized_df_T["index"] == col_name, "Cls-Result"] = result
 
 
 def column_is_binary(df):
