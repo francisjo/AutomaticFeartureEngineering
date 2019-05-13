@@ -17,25 +17,26 @@ def get_summarized_df(df_dict):
         cols_corr_dict_max = sf.columns_correlation_classification_max(encoded_df)
         cols_corr_dict_min = sf.columns_correlation_classification_min(encoded_df)
         cols_corr_dict_strong = sf.columns_correlation_classification_strong(encoded_df)
-        # cols_spearman_dict = sf.columns_correlation_spearman_r(encoded_df)
+        cols_spearman_dict = sf.columns_correlation_spearman_r(encoded_df)
         cols_isbinary = column_is_binary(encoded_df)
-        # cols_is_dependent,cols_critical,cols_stat,cols_dof = sf.columns_correlation_chi2(encoded_df)
-        df_dicts = [cols_dist_dict, cols_freq_dict, cols_corr_dict_min, cols_corr_dict_max, cols_corr_dict_strong, cols_isbinary, cols_type_dict, {}]
+        #cols_is_dependent,cols_critical,cols_stat,cols_dof = sf.columns_correlation_chi2(encoded_df,cols_freq_dict)
+        df_dicts = [cols_dist_dict, cols_freq_dict, cols_corr_dict_min, cols_corr_dict_max, cols_corr_dict_strong, cols_spearman_dict, cols_isbinary, cols_type_dict, {}]
         summarized_df = pd.DataFrame(df_dicts)
-        summarized_df["Method"] = ["Dist", "Freq", "Corr_Min", "Corr_Max", "Corr_Strong", "Is_binary", "D-Type", "Cls-Result"]
+        summarized_df["Method"] = ["Dist", "Freq", "Corr_Min", "Corr_Max", "Corr_Strong","Corr_Spearman", "Is_binary", "D-Type", "Cls-Result"]
         summarized_df = summarized_df.set_index("Method")
         summarized_df_T = summarized_df.T.reset_index()
         get_ground_truth(summarized_df_T, item)
         summarized_dfs = pd.concat([summarized_dfs, summarized_df_T])
 
-    cls_result_replace_map = {"Binary": 0, "Continuous": 1, "Discrete": 2, "Nominal": 3, "Ordinal": 4}
+    cls_result_replace_map = {"Binary": 0, "Numerical": 1, "Nominal": 2, "Ordinal": 3}
     summarized_dfs["Cls-Result"].replace(cls_result_replace_map, inplace=True)
     dtype_replace_map = {"bool": 0, "object": 1, "int64": 2, "float64": 3, "datetime64": 4}
     summarized_dfs["D-Type"].replace(dtype_replace_map, inplace=True)
-    # one_hot = pd.get_dummies(summarized_dfs['D-Type'])
-    # summarized_dfs = summarized_dfs.drop('D-Type', axis=1)
-    # summarized_dfs = summarized_dfs.join(one_hot)
-    # summarized_dfs = summarized_dfs.drop(["Corr_Min", "Corr_Max"], axis=1))
+    one_hot = pd.get_dummies(summarized_dfs['D-Type'])
+    summarized_dfs = summarized_dfs.drop('D-Type', axis=1)
+    #summarized_dfs = summarized_dfs.join(one_hot)
+    summarized_dfs = pd.concat([summarized_dfs, one_hot],axis=1)
+    summarized_dfs = summarized_dfs.drop(["Corr_Min", "Corr_Max","Corr_Strong"], axis=1)
     return summarized_dfs
 
 
@@ -43,9 +44,9 @@ def get_ground_truth(summarized_df_T, item):
     groundtruth_dict = {
         "adult":
              {
-                 "age": "Discrete",
+                 "age": "Numerical",
                   "workclass": "Nominal",
-                  "fnlwgt": "Continuous",
+                  "fnlwgt": "Numerical",
                   "education": "Ordinal",
                   "education-num": "Ordinal",
                   "marital-status": "Nominal",
@@ -53,9 +54,9 @@ def get_ground_truth(summarized_df_T, item):
                   "relationship": "Nominal",
                   "race": "Nominal",
                   "sex": "Binary",
-                  "capital-gain": "Continuous",
-                  "capital-loss": "Continuous",
-                  "hours-per-week": "Discrete",
+                  "capital-gain": "Numerical",
+                  "capital-loss": "Numerical",
+                  "hours-per-week": "Numerical",
                   "native-country": "Nominal",
                   "class": "Binary",
              },
@@ -64,38 +65,40 @@ def get_ground_truth(summarized_df_T, item):
                 "make": "Nominal",
                 "fuel_type": "Binary",
                 "aspiration": "Binary",
-                "num_of_doors": "Discrete",
+                "num_of_doors": "Numerical",
                 "body_style": "Nominal",
                 "drive_wheels": "Binary",
                 "engine_location": "Binary",
-                "wheel_base": "Continuous",
-                "length": "Continuous",
-                "width": "Continuous",
-                "height": "Continuous",
+                "wheel_base": "Numerical",
+                "length": "Numerical",
+                "width": "Numerical",
+                "height": "Numerical",
                 "engine_type": "Nominal",
                 "num_of_cylinders": "Ordinal",
-                "engine_size": "Continuous",
+                "engine_size": "Numerical",
                 "fuel_system": "Nominal",
-                "compression_ratio": "Continuous",
-                "horsepower": "Continuous",
-                "peak_rpm": "Continuous",
-                "city_mpg": "Continuous",
-                "highway_mpg": "Continuous",
-                "price": "Continuous",
-                "curb_weight": "Continuous"
-             },
+                "compression_ratio": "Numerical",
+                "horsepower": "Numerical",
+                "peak_rpm": "Numerical",
+                "city_mpg": "Numerical",
+                "highway_mpg": "Numerical",
+                "price": "Numerical",
+                "curb_weight": "Numerical",
+                "num_of_doors_num": "Binary",
+                "num_of_cylinders_num": "Nominal"
+            },
          "titanic":
              {
-                "PassengerId": "Discrete",
+                "PassengerId": "Numerical",
                 "Survived": "Binary",
                 "Pclass": "Ordinal",
                 "Name": "Nominal",
                 "Sex": "Binary",
-                "Age": "Discrete",
-                "SibSp": "Continuous",
-                "Parch": "Discrete",
+                "Age": "Numerical",
+                "SibSp": "Numerical",
+                "Parch": "Numerical",
                 "Ticket": "Nominal",
-                "Fare": "Continuous",
+                "Fare": "Numerical",
                 "Cabin": "Ordinal",
                 "Embarked": "Nominal",
              },
@@ -104,10 +107,10 @@ def get_ground_truth(summarized_df_T, item):
                 "IDENTIF": "Nominal",
                 "RIVER": "Nominal",
                 "LOCATION": "Nominal",
-                "ERECTED": "Discrete",
+                "ERECTED": "Numerical",
                 "PURPOSE": "Nominal",
-                "LENGTH": "Continuous",
-                "LANES": "Discrete",
+                "LENGTH": "Numerical",
+                "LANES": "Numerical",
                 "CLEAR-G": "Binary",
                 "T-OR-D": "Binary",
                 "MATERIAL": "Nominal",
@@ -117,16 +120,16 @@ def get_ground_truth(summarized_df_T, item):
              },
          "heart":
              {
-                "age": "Discrete",
+                "age": "Numerical",
                 "sex": "Binary",
                 "cp": "Nominal",
-                "trestbps": "Continuous",
-                "chol": "Continuous",
+                "trestbps": "Numerical",
+                "chol": "Numerical",
                 "fbs": "Binary",
                 "restecg": "Nominal",
-                "thalach": "Continuous",
+                "thalach": "Numerical",
                 "exang": "Binary",
-                "oldpeak": "Continuous",
+                "oldpeak": "Numerical",
                 "slope": "Ordinal",
                 "ca": "Nominal",
                 "thal": "Ordinal",

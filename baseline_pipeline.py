@@ -34,10 +34,12 @@ def load_data_local():
     car = 'C:\\Users\\Joseph Francis\\AutomaticFeartureEngineering\\Datasets\\car.csv'
     adult = 'C:\\Users\\Joseph Francis\\AutomaticFeartureEngineering\\Datasets\\adult.csv'
     heart = 'C:\\Users\\Joseph Francis\\AutomaticFeartureEngineering\\Datasets\\heart.csv'
+    bridges = 'C:\\Users\\Joseph Francis\\AutomaticFeartureEngineering\\Datasets\\bridges.csv'
     df_titanic = pd.read_csv(titanic)
     df_car = pd.read_csv(car)
     df_adult = pd.read_csv(adult)
     df_heart = pd.read_csv(heart)
+    df_bridges = pd.read_csv(bridges)
     df_dict = {"titanic": df_titanic, "car": df_car, "adult": df_adult} #, "heart": df_heart
     return df_dict
 
@@ -51,19 +53,23 @@ def run_model_tree(df):
     y = df["Cls-Result"]
 
     # Split Data to Train and Test Data
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=5)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0, random_state=42)
     # Fit Model
     clf = tree.DecisionTreeClassifier(criterion="entropy", random_state=3)
     clf.fit(X_train, y_train)
 
+
     # ==== Test Model on new Data [bridges.csv] ====
-    bridges = 'https://raw.githubusercontent.com/francisjo/AutomaticFeartureEngineering/master/Datasets/bridges.csv'
+
+    #bridges = 'https://raw.githubusercontent.com/francisjo/AutomaticFeartureEngineering/master/Datasets/bridges.csv'
+    bridges = 'C:\\Users\\Joseph Francis\\AutomaticFeartureEngineering\\Datasets\\bridges.csv'
     bridges_df = pd.read_csv(bridges)
     bridges_dict = {"bridges": bridges_df}
     summarized_test = col_classify.get_summarized_df(bridges_dict)
     summarized_test = summarized_test.set_index("index")
     X_test = summarized_test.drop("Cls-Result", axis=1)
     y_test = summarized_test["Cls-Result"]
+
     # ================================
 
     y_predict = clf.predict(X_test)
@@ -78,12 +84,14 @@ def run_model_tree(df):
     print("Features Importance :  ", clf.feature_importances_)
 
     # Applying K-Fold Cross Validation
+    '''
     print("------K-Fold Cross Validation-------")
     accuracies = cross_val_score(estimator=clf, X=X, y=y, cv=5)
     print("Cross-Validation Accuracies:  ", accuracies)
     print("Cross-Validation Mean Accuracy =  ", accuracies.mean())
-
+'''
     # ======== Plot Decision Tree ===========
+    '''
     dot_data = StringIO()
     export_graphviz(clf, out_file=dot_data,
                     feature_names=X.columns,
@@ -92,12 +100,12 @@ def run_model_tree(df):
     graph = pydotplus.graph_from_dot_data(dot_data.getvalue())
     graph.write_png('tree.png')
     Image(graph.create_png())
-
+'''
 
 # passing the data-frame to the run_model() function
 def main_func():
-    df_dict = load_data_online()
-    # df_dict = load_data_local()
+    #df_dict = load_data_online()
+    df_dict = load_data_local()
     summarized_dfs = col_classify.get_summarized_df(df_dict)
     summarized_dfs = summarized_dfs.set_index("index")
     run_model_tree(summarized_dfs)

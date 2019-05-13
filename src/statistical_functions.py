@@ -72,44 +72,46 @@ def columns_correlation_spearman_r(df):
     return result
 
 
-def columns_correlation_chi2(df):
+def columns_correlation_chi2(df,cols_freq_dict):
     result_isdependent = {}
     result_critical = {}
     result_stat = {}
     result_dof = {}
     for col1 in df.columns:
-        chi2_values = pd.DataFrame()
-        for col2 in df.columns:
-            if col1 != col2:
-                if(df[col1].nunique() - 1) * (df[col1].nunique() - 1) <= 100:
-                    dfcrosstab = pd.crosstab(df[col1], df[col2])
-                    stat, p, dof, expected = chi2_contingency(dfcrosstab)
-                    prob = 0.95
-                    critical = chi2.ppf(prob, dof)
-                    if abs(stat) >= critical:
-                        chi2_values[col2] = [1, critical, stat, dof]
-                    else:
-                        chi2_values[col2] = [0, critical, stat, dof]
-        chi2_values_T = chi2_values.T
-        if len(chi2_values_T) != 0:
-            dependent_min = chi2_values_T[chi2_values_T[0] == 1].groupby(chi2_values_T[0]).min()
-            if len(dependent_min) != 0:
-                result_isdependent[col1] = dependent_min.iloc[0, 0]
-                result_critical[col1] = round(dependent_min.iloc[0, 1], 3)
-                result_stat[col1] = round(dependent_min.iloc[0, 2], 3)
-                result_dof[col1] = dependent_min.iloc[0, 3]
+        if cols_freq_dict[col1] < 0.20:
+            chi2_values = pd.DataFrame()
+            for col2 in df.columns:
+                if col1 != col2:
+                    #if(df[col1].nunique() - 1) * (df[col1].nunique() - 1) <= 100:
+                    if cols_freq_dict[col2] < 0.20:
+                        dfcrosstab = pd.crosstab(df[col1], df[col2])
+                        stat, p, dof, expected = chi2_contingency(dfcrosstab)
+                        prob = 0.95
+                        critical = chi2.ppf(prob, dof)
+                        if abs(stat) >= critical:
+                            chi2_values[col2] = [1, critical, stat, dof]
+                        else:
+                            chi2_values[col2] = [0, critical, stat, dof]
+            chi2_values_T = chi2_values.T
+            if len(chi2_values_T) != 0:
+                dependent_min = chi2_values_T[chi2_values_T[0] == 1].groupby(chi2_values_T[0]).min()
+                if len(dependent_min) != 0:
+                    result_isdependent[col1] = dependent_min.iloc[0, 0]
+                    result_critical[col1] = round(dependent_min.iloc[0, 1], 3)
+                    result_stat[col1] = round(dependent_min.iloc[0, 2], 3)
+                    result_dof[col1] = dependent_min.iloc[0, 3]
+                else:
+                    independent_min = chi2_values_T[chi2_values_T[0] == 0].groupby(chi2_values_T[0]).min()
+                    if len(independent_min) != 0:
+                        result_isdependent[col1] = independent_min.iloc[0, 0]
+                        result_critical[col1] = round(Decimal(independent_min.iloc[0, 1]), 3)
+                        result_stat[col1] = round(Decimal(independent_min.iloc[0, 2]), 3)
+                        result_dof[col1] = independent_min.iloc[0, 3]
             else:
-                independent_min = chi2_values_T[chi2_values_T[0] == 0].groupby(chi2_values_T[0]).min()
-                if len(independent_min) != 0:
-                    result_isdependent[col1] = independent_min.iloc[0, 0]
-                    result_critical[col1] = round(Decimal(independent_min.iloc[0, 1]), 3)
-                    result_stat[col1] = round(Decimal(independent_min.iloc[0, 2]), 3)
-                    result_dof[col1] = independent_min.iloc[0, 3]
-        else:
-            result_isdependent[col1] = 0
-            result_critical[col1] = 0
-            result_stat[col1] = 0
-            result_dof[col1] = 0
+                result_isdependent[col1] = 0
+                result_critical[col1] = 0
+                result_stat[col1] = 0
+                result_dof[col1] = 0
 
     return result_isdependent, result_critical, result_stat, result_dof
 
