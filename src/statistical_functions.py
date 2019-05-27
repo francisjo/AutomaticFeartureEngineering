@@ -72,7 +72,35 @@ def columns_correlation_spearman_r(df):
     return result
 
 
-def columns_correlation_chi2(df,cols_freq_dict):
+
+def columns_correlation_spearman_r_test(df):
+    result = {}
+    resultwithname = {}
+    for col1 in df.columns:
+        spearmanr_values = pd.Series()
+        for col2 in df.columns:
+            if col1 != col2:
+                value = stats.spearmanr(df[col1], df[col2])[0]
+                spearmanr_values[col2] = [value, col2]
+        max_val = spearmanr_values.max()
+        min_val = spearmanr_values.min()
+        max_val_abs = [max_val[0], abs(max_val[0]), max_val[1]]
+        min_val_abs = [min_val[0], abs(min_val[0]), min_val[1]]
+        strong_value = max(max_val_abs[1], min_val_abs[1])
+        if strong_value == max_val_abs[1]:
+            strong_value = max_val_abs[0]
+            strong_name = max_val_abs[2]
+        else:
+            strong_value = min_val_abs[0]
+            strong_name = min_val_abs[2]
+        result[col1] = round(Decimal(strong_value), 3)
+        resultwithname[col1] = strong_name
+    return result, resultwithname
+
+
+
+
+def columns_correlation_chi2(df, cols_freq_dict):
     result_isdependent = {}
     result_critical = {}
     result_stat = {}

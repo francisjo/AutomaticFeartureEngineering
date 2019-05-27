@@ -4,10 +4,13 @@ import pandas as pd
 
 # fill null values with respect to the column data-type #
 def fill_null_data(df, col, col_type):
+    df.dropna(axis=0, how='any', inplace=True)
+    '''
     if df[col].isnull().sum() > 0 and col_type == 'string':
         df[col].fillna('missing', inplace=True)
     elif df[col].isnull().sum() > 0 and col_type == 'numeric':
         df[col].fillna(df[col].mean(), inplace=True)
+    '''
 
 '''
 # convert Date col to Datetime and split it to Year,Month,Day Columns #
