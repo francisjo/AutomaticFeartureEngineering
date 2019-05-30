@@ -28,13 +28,19 @@ def load_data_online():
     adult = 'https://raw.githubusercontent.com/francisjo/AutomaticFeartureEngineering/master/Datasets/adult.csv'
     heart = 'https://raw.githubusercontent.com/francisjo/AutomaticFeartureEngineering/master/Datasets/heart.csv'
     bridges = 'https://raw.githubusercontent.com/francisjo/AutomaticFeartureEngineering/master/Datasets/bridges.csv'
+    audiology = 'https://raw.githubusercontent.com/francisjo/AutomaticFeartureEngineering/master/Datasets/audiologystandardized.csv'
+    car1 = 'https://raw.githubusercontent.com/francisjo/AutomaticFeartureEngineering/master/Datasets/car1.csv'
+    random = 'https://raw.githubusercontent.com/francisjo/AutomaticFeartureEngineering/master/Datasets/random.csv'
 
     df_titanic = pd.read_csv(titanic)
     df_car = pd.read_csv(car)
     df_adult = pd.read_csv(adult)
     df_heart = pd.read_csv(heart)
     df_bridges = pd.read_csv(bridges)
-    df_dict = {"titanic": df_titanic, "car": df_car, "adult": df_adult} #, "heart": df_heart
+    df_audiology = pd.read_csv(audiology)
+    df_car1 = pd.read_csv(car1)
+    df_random = pd.read_csv(random)
+    df_dict = {"titanic": df_titanic, "car": df_car, "adult": df_adult, "audiology": df_audiology, "bridges": df_bridges, "random": df_random} #, "heart": df_heart
 
     return df_dict
 
@@ -68,11 +74,11 @@ def run_model_tree(df):
     clf.fit(X_train, y_train)
 
     # ==== Test Model on new Data [bridges.csv] ====
-    bridges = 'https://raw.githubusercontent.com/francisjo/AutomaticFeartureEngineering/master/Datasets/bridges.csv'
+    car1 = 'https://raw.githubusercontent.com/francisjo/AutomaticFeartureEngineering/master/Datasets/car1.csv'
     # bridges = 'C:\\Users\\Joseph Francis\\AutomaticFeartureEngineering\\Datasets\\bridges.csv'
-    bridges_df = pd.read_csv(bridges)
-    bridges_dict = {"bridges": bridges_df}
-    summarized_test = col_classify.get_summarized_df(bridges_dict)
+    car1_df = pd.read_csv(car1)
+    car1_dict = {"car1": car1_df}
+    summarized_test = col_classify.get_summarized_df(car1_dict)
     summarized_test = summarized_test.set_index("index")
     X_test = summarized_test.drop("Cls-Result", axis=1)
     y_test = summarized_test["Cls-Result"]
@@ -80,24 +86,24 @@ def run_model_tree(df):
     # ================================
 
     y_predict = clf.predict(X_test)
-    print("------Classification Report-------")
-    print(classification_report(y_test, y_predict))
+    print(y_predict)
+    #print("------Classification Report-------")
+    #print(classification_report(y_test, y_predict))
     score = clf.score(X_test, y_test)
     print("Decision Tree Score: ", score)
 
 
-
-
-    #print("Confusion Matrix")
-    #cm = confusion_matrix(y_test, y_predict)
-    #plot_confusion_matrix(cm, ["Numerical", "Nominal", "Ordinal"])
+    print("Confusion Matrix")
+    cm = confusion_matrix(y_test, y_predict)
+    print(cm)
+    plot_confusion_matrix(cm, ["Numerical", "Nominal", "Ordinal"])
 
     predictdf = pd.DataFrame(y_predict)
     predictdf.columns = ['new_clf']
 
 
     print("--- Ground-truth and Prediction Results ---")
-    final_clf_df = pd.concat([y_test.reset_index(),predictdf], axis=1)
+    final_clf_df = pd.concat([y_test.reset_index(), predictdf], axis=1)
     print(final_clf_df)
     return final_clf_df
 
@@ -259,10 +265,10 @@ def main_func():
     summarized_dfs = col_classify.get_summarized_df(df_dict)
     summarized_dfs = summarized_dfs.set_index("index")
     final_clf_df = run_model_tree(summarized_dfs)
-    bridges = 'https://raw.githubusercontent.com/francisjo/AutomaticFeartureEngineering/master/Datasets/bridges.csv'
+    #bridges = 'https://raw.githubusercontent.com/francisjo/AutomaticFeartureEngineering/master/Datasets/bridges.csv'
     # bridges = 'C:\\Users\\Joseph Francis\\AutomaticFeartureEngineering\\Datasets\\bridges.csv'
-    bridges_df = pd.read_csv(bridges)
-    run_model_representation(bridges_df,final_clf_df)
+    #bridges_df = pd.read_csv(bridges)
+    #run_model_representation(bridges_df,final_clf_df)
 
 
 main_func()

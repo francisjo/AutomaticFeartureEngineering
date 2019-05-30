@@ -37,9 +37,24 @@ def get_summarized_df(df_dict):
     summarized_dfs = summarized_dfs.drop('D-Type', axis=1)
     # summarized_dfs = summarized_dfs.join(one_hot)
     summarized_dfs = pd.concat([summarized_dfs, one_hot], axis=1)
+    summarized_dfs = correct_missing_column(summarized_dfs)
     summarized_dfs = summarized_dfs.drop(["Corr_Min", "Corr_Max", "Corr_Strong", "corr_col", "word2vec_std", "Corr"], axis=1)
 
     return summarized_dfs
+
+
+def correct_missing_column(df):
+    if 0 not in df.columns:
+        df['0'] = 0
+    if 1 not in df.columns:
+        df['1'] = 0
+    if 2 not in df.columns:
+        df['2'] = 0
+    if 3 not in df.columns:
+        df['3'] = 0
+    if 4 not in df.columns:
+        df['4'] = 0
+    return df
 
 
 def get_ground_truth(summarized_df_T, item):
@@ -136,7 +151,35 @@ def get_ground_truth(summarized_df_T, item):
                 "ca": "Nominal",
                 "thal": "Ordinal",
                 "target": "Nominal",
-             }
+             },
+         "audiology":
+            {
+                "air": "Ordinal",
+                "ar_c": "Nominal",
+                "ar_u": "Nominal",
+                "o_ar_c": "Nominal",
+                "o_ar_u": "Nominal",
+                "speech": "Ordinal",
+                "indentifier": "Nominal",
+                "class": "Nominal"
+            },
+         "car1":
+             {
+                 "buying": "Nominal",
+                 "maint": "Ordinal",
+                 "doors": "Numerical",
+                 "persons": "Numerical",
+                 "lug_boot": "Ordinal",
+                 "safety": "Ordinal"
+             },
+         "random":
+             {
+                 "Color": "Nominal",
+                 "Size": "Ordinal",
+                 "Act": "Nominal",
+                 "Age": "Nominal",
+                 "Inflated": "Nominal"
+         }
     }
     for col_name in summarized_df_T['index']:
         result = groundtruth_dict[item].get(col_name)
