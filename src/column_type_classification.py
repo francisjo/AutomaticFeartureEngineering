@@ -1,7 +1,6 @@
 import pandas.api.types as ptypes
 import pandas as pd
 from sklearn.preprocessing import LabelEncoder
-import category_encoders as ce
 
 import data_cleaning as cd
 import statistical_functions as sf
@@ -11,6 +10,8 @@ def get_summarized_df(df_dict):
     summarized_dfs = pd.DataFrame()
     for item, value in df_dict.items():
         cols_type_dict = get_column_type(value)
+        value = value.apply(lambda x: x.str.strip() if x.dtype == "object" else x)
+        word2vec_mean, word2vec_std = sf.word2vec_distances(value)
         encoded_df = encode_string_column(value)
         cols_dist_dict = sf.columns_distribution_classification(encoded_df)
         cols_freq_dict = sf.columns_frequency_classification(encoded_df)
@@ -20,9 +21,9 @@ def get_summarized_df(df_dict):
         cols_spearman_dict, col_names = sf.columns_correlation_spearman_r_test(encoded_df)
         cols_isbinary = column_is_binary(encoded_df)
         #cols_is_dependent,cols_critical,cols_stat,cols_dof = sf.columns_correlation_chi2(encoded_df,cols_freq_dict)
-        df_dicts = [cols_dist_dict, cols_freq_dict, cols_corr_dict_min, cols_corr_dict_max, cols_corr_dict_strong, cols_spearman_dict, col_names, cols_isbinary, cols_type_dict, {}]
+        df_dicts = [cols_dist_dict, cols_freq_dict, cols_corr_dict_min, cols_corr_dict_max, cols_corr_dict_strong, cols_spearman_dict, col_names, word2vec_mean, word2vec_std, cols_isbinary, cols_type_dict, {}]
         summarized_df = pd.DataFrame(df_dicts)
-        summarized_df["Method"] = ["Dist", "Freq", "Corr_Min", "Corr_Max", "Corr_Strong", "Corr", "corr_col", "Is_binary", "D-Type", "Cls-Result"]
+        summarized_df["Method"] = ["Dist", "Freq", "Corr_Min", "Corr_Max", "Corr_Strong", "Corr", "corr_col", "word2vec_mean", "word2vec_std", "Is_binary", "D-Type", "Cls-Result"]
         summarized_df = summarized_df.set_index("Method")
         summarized_df_T = summarized_df.T.reset_index()
         get_ground_truth(summarized_df_T, item)
@@ -36,7 +37,8 @@ def get_summarized_df(df_dict):
     summarized_dfs = summarized_dfs.drop('D-Type', axis=1)
     # summarized_dfs = summarized_dfs.join(one_hot)
     summarized_dfs = pd.concat([summarized_dfs, one_hot], axis=1)
-    #summarized_dfs = summarized_dfs.drop(["Corr_Min", "Corr_Max", "Corr_Strong", "corr_col"], axis=1)
+    summarized_dfs = summarized_dfs.drop(["Corr_Min", "Corr_Max", "Corr_Strong", "corr_col", "word2vec_std", "Corr"], axis=1)
+
     return summarized_dfs
 
 
@@ -106,7 +108,7 @@ def get_ground_truth(summarized_df_T, item):
              {
                 "IDENTIF": "Nominal",
                 "RIVER": "Nominal",
-                "LOCATION": "Nominal",
+                "LOCATION": "Numerical",
                 "ERECTED": "Numerical",
                 "PURPOSE": "Nominal",
                 "LENGTH": "Numerical",

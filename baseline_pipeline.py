@@ -3,20 +3,27 @@ import pandas as pd
 from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn.metrics import classification_report, confusion_matrix
 from sklearn import tree
-
+from sklearn.impute import SimpleImputer
+from sklearn.pipeline import Pipeline
+from sklearn.compose import ColumnTransformer
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import LogisticRegression
+import category_encoders as ce
+import word2vec_load as w2v
 import column_type_classification as col_classify
-
 from sklearn.tree import export_graphviz
 from sklearn.externals.six import StringIO
 from IPython.display import Image
 import pydotplus
+import numpy as np
+
 import matplotlib.pyplot as plt
 from pandas.plotting import scatter_matrix
 
 
 # load dataset into a pandas data-frame
 def load_data_online():
-    titanic = 'https://raw.githubusercontent.com/nphardly/titanic/master/data/inputs/train.csv'
+    titanic = 'https://raw.githubusercontent.com/francisjo/AutomaticFeartureEngineering/master/Datasets/train.csv'
     car = 'https://raw.githubusercontent.com/francisjo/AutomaticFeartureEngineering/master/Datasets/car.csv'
     adult = 'https://raw.githubusercontent.com/francisjo/AutomaticFeartureEngineering/master/Datasets/adult.csv'
     heart = 'https://raw.githubusercontent.com/francisjo/AutomaticFeartureEngineering/master/Datasets/heart.csv'
@@ -57,7 +64,7 @@ def run_model_tree(df):
     # Split Data to Train and Test Data
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0, random_state=42)
     # Fit Model
-    clf = tree.DecisionTreeClassifier(criterion="gini", random_state=3, max_depth=4)
+    clf = tree.DecisionTreeClassifier(criterion="gini", random_state=3)
     clf.fit(X_train, y_train)
 
     # ==== Test Model on new Data [bridges.csv] ====
@@ -77,15 +84,25 @@ def run_model_tree(df):
     print(classification_report(y_test, y_predict))
     score = clf.score(X_test, y_test)
     print("Decision Tree Score: ", score)
-    print("Confusion Matrix")
-    cm = confusion_matrix(y_test, y_predict)
-    plot_confusion_matrix(cm, ["Numerical", "Nominal", "Ordinal"])
-    print("--- Prediction Results ---")
-    print(y_predict)
-    print("--- Ground-truth ---")
-    print(y_test)
-    print("Features Importance :  ", clf.feature_importances_)
 
+
+
+
+    #print("Confusion Matrix")
+    #cm = confusion_matrix(y_test, y_predict)
+    #plot_confusion_matrix(cm, ["Numerical", "Nominal", "Ordinal"])
+
+    predictdf = pd.DataFrame(y_predict)
+    predictdf.columns = ['new_clf']
+
+
+    print("--- Ground-truth and Prediction Results ---")
+    final_clf_df = pd.concat([y_test.reset_index(),predictdf], axis=1)
+    print(final_clf_df)
+    return final_clf_df
+
+"""
+    print("Features Importance :  ", clf.feature_importances_)
     # Applying K-Fold Cross Validation
     print("------K-Fold Cross Validation-------")
     accuracies = cross_val_score(estimator=clf, X=X_test, y=y_test, cv=5)
@@ -94,7 +111,7 @@ def run_model_tree(df):
 
     # ======== Plot Decision Tree ===========
     plot_decision_tree_model(clf, X)
-
+"""
 
 def plot_confusion_matrix(cm, target_names, normalize=True):
     import matplotlib.pyplot as plt
@@ -154,13 +171,98 @@ def plot_decision_tree_model(clf, X):
     Image(graph.create_png())
 
 
+# drop the target label from a list
+def drop_target_label(cols_list, target_label):
+    for value in cols_list:
+        if value == target_label:
+            cols_list.remove(value)
+            break
+    return cols_list
+
+def run_model_representation(df,clf_df):
+    target_label = "binaryClass"
+    # split data-time column if exists
+    #cd.split_datetime_col(df)
+
+    # classify columns to categorical and numerical
+    #summarized_df, numeric_cols, nominal_cols, ordinal_cols = nmeric_nominal_ordinal_cols(df)
+    numeric_cols = drop_target_label(clf_df.loc[clf_df["new_clf"] == 1,"index"].tolist(), target_label)
+    nominal_cols = drop_target_label(clf_df.loc[clf_df["new_clf"] == 2,"index"].tolist(), target_label)
+    ordinal_cols = drop_target_label(clf_df.loc[clf_df["new_clf"] == 3,"index"].tolist(), target_label)
+
+    simple_imputer = SimpleImputer(strategy="most_frequent", copy=False)
+
+    numeric_transformer = Pipeline(
+        steps=
+        [
+            ('imputer', SimpleImputer(missing_values=np.NaN, strategy='mean', copy=False)),
+            ('scaler', StandardScaler())
+        ]
+    )
+
+    categorical_transformer_ordinal = Pipeline(
+        steps=
+        [
+            ('imputer', simple_imputer),
+            ('LabelEncoder', ce.BinaryEncoder())
+        ]
+    )
+    #OneHotEncoder
+    categorical_transformer_nominal = Pipeline(
+        steps=
+        [
+            ('imputer', simple_imputer),
+            ('OneHotEncoder', ce.BinaryEncoder())
+        ]
+    )
+
+    # combine transformers in one Preprocessor
+    preprocessor = ColumnTransformer(
+        transformers=
+        [
+            ('num', numeric_transformer, numeric_cols),
+            ('cat_ordinal', categorical_transformer_ordinal, ordinal_cols),
+            ('cat_nominal', categorical_transformer_nominal, nominal_cols)
+        ]
+    )
+
+    # append classifier to pre-processing pipeline.
+    classifier = Pipeline(
+        steps=
+        [
+            ('preprocessor', preprocessor),
+            ('classifier', LogisticRegression(solver='lbfgs', max_iter=1000))
+        ]
+    )
+
+    # Features
+    X = df.drop(target_label, axis=1)
+
+    # Target Label
+    y = df[target_label]
+
+    # Split Data to Train and Test Data
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33, random_state=42)
+
+    # Fit Model
+    classifier.fit(X_train, y_train)
+
+    score = classifier.score(X_test, y_test)
+    print(score)
+
+
 # passing the data-frame to the run_model() function
 def main_func():
+    w2v.init()
     df_dict = load_data_online()
     # df_dict = load_data_local()
     summarized_dfs = col_classify.get_summarized_df(df_dict)
     summarized_dfs = summarized_dfs.set_index("index")
-    run_model_tree(summarized_dfs)
+    final_clf_df = run_model_tree(summarized_dfs)
+    bridges = 'https://raw.githubusercontent.com/francisjo/AutomaticFeartureEngineering/master/Datasets/bridges.csv'
+    # bridges = 'C:\\Users\\Joseph Francis\\AutomaticFeartureEngineering\\Datasets\\bridges.csv'
+    bridges_df = pd.read_csv(bridges)
+    run_model_representation(bridges_df,final_clf_df)
 
 
 main_func()

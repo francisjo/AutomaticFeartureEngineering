@@ -3,6 +3,10 @@ import pandas as pd
 import scipy.stats as stats
 from scipy.stats import chi2_contingency
 from scipy.stats import chi2
+import pandas.api.types as ptypes
+import numpy as np
+import word2vec_load as w2v
+
 
 # Compute the maximum correlation of values inside each column in the provided data-frame #
 def columns_correlation_classification_max(df):
@@ -72,7 +76,6 @@ def columns_correlation_spearman_r(df):
     return result
 
 
-
 def columns_correlation_spearman_r_test(df):
     result = {}
     resultwithname = {}
@@ -96,8 +99,6 @@ def columns_correlation_spearman_r_test(df):
         result[col1] = round(Decimal(strong_value), 3)
         resultwithname[col1] = strong_name
     return result, resultwithname
-
-
 
 
 def columns_correlation_chi2(df, cols_freq_dict):
@@ -163,4 +164,33 @@ def columns_distribution_classification(df):
         max_val = col_dist.max()
         result[col] = round(Decimal(max_val), 3)
     return result
+
+
+def word2vec_distances(df):
+    model = w2v.model
+    result_mean = {}
+    result_std = {}
+    for col in df.columns:
+        if ptypes.is_string_dtype(df[col]):
+            my_words = df[col].unique()
+            my_words = [word for word in my_words if word in model]  # filter out words not in model
+            if len(my_words) < 2:
+                result_mean[col] = 0.0
+                result_std[col] = 0.0
+                continue
+            # Make a list of all word-to-word distances [each as a tuple of (word1,word2,dist)]
+            dists = []
+            # Method 1 to find distances: use gensim to get the similarity between each word pair
+            for i1, word1 in enumerate(my_words):
+                for i2, word2 in enumerate(my_words):
+                    if i1 >= i2:
+                        continue
+                    cosine_distance = model.distance(word1, word2)
+                    dists.append(cosine_distance)
+            result_mean[col] = round(Decimal(np.mean(dists)), 3)
+            result_std[col] = round(Decimal(np.std(dists)), 3)
+        elif ptypes.is_numeric_dtype(df[col]):
+            result_mean[col] = 0.0
+            result_std[col] = 0.0
+    return result_mean, result_std,
 
