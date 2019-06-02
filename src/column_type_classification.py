@@ -216,3 +216,4 @@ def get_column_type(df):
     for col in df.columns:
         result[col] = df[col].dtype
     return result
+
