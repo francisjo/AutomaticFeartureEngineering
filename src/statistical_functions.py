@@ -6,6 +6,8 @@ from scipy.stats import chi2
 import pandas.api.types as ptypes
 import numpy as np
 import word2vec_load as w2v
+from sklearn.preprocessing import LabelEncoder
+from scipy.stats import skew
 
 
 # Compute the maximum correlation of values inside each column in the provided data-frame #
@@ -167,7 +169,7 @@ def columns_distribution_classification(df):
 
 
 def word2vec_distances(df):
-    model = w2v.model
+    model = w2v.w2v_model
     result_mean = {}
     result_std = {}
     for col in df.columns:
@@ -193,4 +195,38 @@ def word2vec_distances(df):
             result_mean[col] = 0.0
             result_std[col] = 0.0
     return result_mean, result_std,
+
+
+def column_values_skewness(df):
+    result = {}
+    for col in df.columns:
+        x = skew(df[col].values)
+        result[col] = round(Decimal(x), 3)
+    return result
+
+
+def doc2vec_vector(df):
+    model = w2v.d2v_model
+    result = {}
+    result_norm = {}
+    for col in df.columns:
+        if ptypes.is_string_dtype(df[col]):
+            my_words = df[col].unique().tolist()
+            my_words = [my_word for my_word in my_words if str(my_word) != 'nan']
+            vector = model.infer_vector(my_words)
+            vector_norm = np.linalg.norm(vector)
+            result[col] = vector.tolist()
+            result_norm[col] = vector_norm
+
+        elif ptypes.is_numeric_dtype(df[col]):
+            result[col] = [0.0]
+            result_norm[col] = 0.0
+    return result_norm,result
+
+
+
+
+
+
+
 
