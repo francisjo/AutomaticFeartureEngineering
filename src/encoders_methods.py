@@ -365,8 +365,8 @@ def get_multi_classifier(key1, key2, encoder1, encoder2, single_col, other_cols,
     preprocessor = ColumnTransformer(
         transformers=
         [
+            ('single_col', single_col_transformer, [single_col]),
             ('num', numeric_transformer, numeric_list),
-            ('single_col', single_col_transformer, single_col),
             ('other_cols', other_cols_transformer, other_cols)
         ]
     )
@@ -385,7 +385,7 @@ def apply_multiple_encoders_for_one_column_against_others(single_col, other_cols
                     'BinaryEncoder': ce.BinaryEncoder(),
                     'HashingEncoder': ce.HashingEncoder(),
                     # 'OrdinalEncoder': ce.OrdinalEncoder(),
-                    'PolynomialEncoder': ce.PolynomialEncoder(),
+                    #'PolynomialEncoder': ce.PolynomialEncoder(),
                     # 'TargetEncoder': ce.TargetEncoder(),
                     'HelmertEncoder': ce.HelmertEncoder(),
                     # 'JamesSteinEncoder': ce.JamesSteinEncoder(),
@@ -402,7 +402,7 @@ def apply_multiple_encoders_for_one_column_against_others(single_col, other_cols
 
 
 def multiple_encoders_for_all_columns():
-    datasets_dict = ld.load_data_online()
+    datasets_dict = ld.load_data_local()
     groundtruth_dict = {
         "adult":
             {
@@ -542,13 +542,13 @@ def multiple_encoders_for_all_columns():
         target = target_dict[ds_key]
         numeric_list = [x for x in ground_truth if ground_truth[x] == 'Numerical']
         categorical_list = [x for x in ground_truth if ground_truth[x] != 'Numerical']
+        categorical_list.remove(target)
         for item in categorical_list:
             if item != target:
                 col_type = ground_truth[item]
                 single_col = item
                 other_cols = categorical_list
                 other_cols.remove(single_col)
-                other_cols.remove(target)
                 #numeric_list.remove(target)
                 classifiers_list = apply_multiple_encoders_for_one_column_against_others(single_col, other_cols, numeric_list)
 
