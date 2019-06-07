@@ -117,7 +117,7 @@ def run_model_representation(df, clf_df):
     # print(encoders_comparison_df)
 
 
-# ======= single encoding againest target variable =============
+# =========== single encoding againest target variable =============
 
 
 def single_pipeline(col, col_type):
@@ -125,23 +125,32 @@ def single_pipeline(col, col_type):
                     'BinaryEncoder': ce.BinaryEncoder(),
                     'HashingEncoder': ce.HashingEncoder(),
                     # 'OrdinalEncoder': ce.OrdinalEncoder(),
-                    'PolynomialEncoder': ce.PolynomialEncoder(),
+                    # 'PolynomialEncoder': ce.PolynomialEncoder(),
                     # 'TargetEncoder': ce.TargetEncoder(),
                     'HelmertEncoder': ce.HelmertEncoder(),
                     # 'JamesSteinEncoder': ce.JamesSteinEncoder(),
                     'BaseNEncoder': ce.BaseNEncoder(),
-                    'SumEncoder': ce.SumEncoder()}
+                    'SumEncoder': ce.SumEncoder()
+                    }
     classifiers_list = []
-    for key, encoder in encoder_dict.items():
-        if col_type == "Numerical":
-            transformer = Pipeline(
-                steps=
-                [
-                    ('imputer', SimpleImputer(missing_values=np.NaN, strategy='mean', copy=False)),
-                    ('scaler', StandardScaler())
-                ]
-            )
-        else:
+    if col_type == "Numerical":
+        transformer = Pipeline(
+            steps=
+            [
+                ('imputer', SimpleImputer(missing_values=np.NaN, strategy='mean', copy=False)),
+                ('scaler', StandardScaler())
+            ]
+        )
+        classifier = Pipeline(
+            steps=
+            [
+                ('transformer', transformer),
+                ('classifier', LogisticRegression(solver='lbfgs', max_iter=1000))
+            ]
+        )
+        classifiers_list.append([classifier, "Numerical"])
+    else:
+        for key, encoder in encoder_dict.items():
             transformer = Pipeline(
                 steps=
                 [
@@ -149,20 +158,14 @@ def single_pipeline(col, col_type):
                     (key, encoder)
                 ]
             )
-        preprocessor = ColumnTransformer(
-            transformers=
-            [
-                ('trans', transformer, col),
-            ]
-        )
-        classifier = Pipeline(
-            steps=
-            [
-                ('preprocessor', preprocessor),
-                ('classifier', LogisticRegression(solver='lbfgs', max_iter=1000))
-            ]
-        )
-        classifiers_list.append([classifier, key])
+            classifier = Pipeline(
+                steps=
+                [
+                    ('transformer', transformer),
+                    ('classifier', LogisticRegression(solver='lbfgs', max_iter=1000))
+                ]
+            )
+            classifiers_list.append([classifier, key])
     return classifiers_list
 
 
@@ -301,6 +304,7 @@ def single_encoder_against_target():
                    "random": "Inflated"}
     encoders_comparison_df = pd.DataFrame(columns=['DataSetName', 'ColumnName', 'ColumnType', 'Encoder', 'Score'])
 
+    i = 0
     for ds_key, df in datasets_dict.items():
         ground_truth = groundtruth_dict[ds_key]
         target = target_dict[ds_key]
@@ -308,7 +312,6 @@ def single_encoder_against_target():
             if col != target:
                 col_type = ground_truth[col]
                 classifiers_list = single_pipeline(col, col_type)
-                i = 0
                 for element in classifiers_list:
                     classifier = element[0]
                     enc_key = element[1]
@@ -319,7 +322,7 @@ def single_encoder_against_target():
                         le = LabelEncoder()
                         y = le.fit_transform(df[target])
                         y = pd.Series(y)
-                    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33, random_state=42)
+                    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.40, random_state=42)
 
                     classifier.fit(X_train, y_train)
                     score = classifier.score(X_test, y_test)
@@ -333,5 +336,245 @@ def single_encoder_against_target():
     encoders_comparison_df.to_csv('single_encoder_against_target.csv', sep=',', header=True)
 
 
-single_encoder_against_target()
+# ============================ One column against other columns ==========================
+
+
+def get_multi_classifier(key1, key2, encoder1, encoder2, single_col, other_cols, numeric_list):
+
+    numeric_transformer = Pipeline(
+        steps=
+        [
+            ('imputer', SimpleImputer(missing_values=np.NaN, strategy='mean', copy=False)),
+            ('scaler', StandardScaler())
+        ]
+    )
+    single_col_transformer = Pipeline(
+        steps=
+        [
+            ('imputer', SimpleImputer(strategy="most_frequent", copy=False)),
+            (key1, encoder1)
+        ]
+    )
+    other_cols_transformer = Pipeline(
+        steps=
+        [
+            ('imputer', SimpleImputer(strategy="most_frequent", copy=False)),
+            (key2, encoder2)
+        ]
+    )
+    preprocessor = ColumnTransformer(
+        transformers=
+        [
+            ('num', numeric_transformer, numeric_list),
+            ('single_col', single_col_transformer, single_col),
+            ('other_cols', other_cols_transformer, other_cols)
+        ]
+    )
+    classifier = Pipeline(
+        steps=
+        [
+            ('preprocessor', preprocessor),
+            ('classifier', LogisticRegression(solver='lbfgs', max_iter=1000))
+        ]
+    )
+    return classifier
+
+
+def apply_multiple_encoders_for_one_column_against_others(single_col, other_cols, numeric_list):
+    encoder_dict = {'OneHotEncoder': ce.OneHotEncoder(),
+                    'BinaryEncoder': ce.BinaryEncoder(),
+                    'HashingEncoder': ce.HashingEncoder(),
+                    # 'OrdinalEncoder': ce.OrdinalEncoder(),
+                    'PolynomialEncoder': ce.PolynomialEncoder(),
+                    # 'TargetEncoder': ce.TargetEncoder(),
+                    'HelmertEncoder': ce.HelmertEncoder(),
+                    # 'JamesSteinEncoder': ce.JamesSteinEncoder(),
+                    'BaseNEncoder': ce.BaseNEncoder(),
+                    'SumEncoder': ce.SumEncoder()}
+    classifiers_list = []
+    for key1, encoder1 in encoder_dict.items():
+        for key2, encoder2 in encoder_dict.items():
+            classifier2 = get_multi_classifier(key2, key1, encoder2, encoder1, single_col, other_cols, numeric_list)
+            classifiers_list.append([key1, key2, classifier2])
+        classifier1 = get_multi_classifier(key1, key2, encoder1, encoder2, single_col, other_cols, numeric_list)
+        classifiers_list.append([key1, key2, classifier1])
+    return classifiers_list
+
+
+def multiple_encoders_for_all_columns():
+    datasets_dict = ld.load_data_online()
+    groundtruth_dict = {
+        "adult":
+            {
+                "age": "Numerical",
+                "workclass": "Nominal",
+                "fnlwgt": "Numerical",
+                "education": "Ordinal",
+                "education-num": "Ordinal",
+                "marital-status": "Nominal",
+                "occupation": "Nominal",
+                "relationship": "Nominal",
+                "race": "Nominal",
+                "sex": "Nominal",
+                "capital-gain": "Numerical",
+                "capital-loss": "Numerical",
+                "hours-per-week": "Numerical",
+                "native-country": "Nominal",
+                "class": "Nominal",
+            },
+        "car":
+            {
+                "make": "Nominal",
+                "fuel_type": "Nominal",
+                "aspiration": "Nominal",
+                "num_of_doors": "Numerical",
+                "body_style": "Nominal",
+                "drive_wheels": "Nominal",
+                "engine_location": "Nominal",
+                "wheel_base": "Numerical",
+                "length": "Numerical",
+                "width": "Numerical",
+                "height": "Numerical",
+                "engine_type": "Nominal",
+                "num_of_cylinders": "Nominal",
+                "engine_size": "Numerical",
+                "fuel_system": "Nominal",
+                "compression_ratio": "Numerical",
+                "horsepower": "Numerical",
+                "peak_rpm": "Numerical",
+                "city_mpg": "Numerical",
+                "highway_mpg": "Numerical",
+                "price": "Numerical",
+                "curb_weight": "Numerical",
+                "num_of_doors_num": "Nominal",
+                "num_of_cylinders_num": "Numerical"
+            },
+        "titanic":
+            {
+                "PassengerId": "Nominal",
+                "Survived": "Nominal",
+                "Pclass": "Ordinal",
+                "Name": "Nominal",
+                "Sex": "Nominal",
+                "Age": "Numerical",
+                "SibSp": "Numerical",
+                "Parch": "Numerical",
+                "Ticket": "Nominal",
+                "Fare": "Numerical",
+                "Cabin": "Ordinal",
+                "Embarked": "Nominal",
+            },
+        "bridges":
+            {
+                "IDENTIF": "Nominal",
+                "RIVER": "Nominal",
+                "LOCATION": "Numerical",
+                "ERECTED": "Numerical",
+                "PURPOSE": "Nominal",
+                "LENGTH": "Numerical",
+                "LANES": "Numerical",
+                "CLEAR-G": "Nominal",
+                "T-OR-D": "Nominal",
+                "MATERIAL": "Nominal",
+                "SPAN": "Ordinal",
+                "REL-L": "Nominal",
+                "binaryClass": "Nominal"
+            },
+        "heart":
+            {
+                "age": "Numerical",
+                "sex": "Nominal",
+                "cp": "Nominal",
+                "trestbps": "Numerical",
+                "chol": "Numerical",
+                "fbs": "Nominal",
+                "restecg": "Nominal",
+                "thalach": "Numerical",
+                "exang": "Nominal",
+                "oldpeak": "Numerical",
+                "slope": "Ordinal",
+                "ca": "Nominal",
+                "thal": "Ordinal",
+                "target": "Nominal",
+            },
+        "audiology":
+            {
+                "air": "Ordinal",
+                "ar_c": "Nominal",
+                "ar_u": "Nominal",
+                "o_ar_c": "Nominal",
+                "o_ar_u": "Nominal",
+                "speech": "Ordinal",
+                "indentifier": "Nominal",
+                "class": "Nominal"
+            },
+        "car1":
+            {
+                "buying": "Nominal",
+                "maint": "Ordinal",
+                "doors": "Numerical",
+                "persons": "Numerical",
+                "lug_boot": "Ordinal",
+                "safety": "Ordinal"
+            },
+        "random":
+            {
+                "Color": "Nominal",
+                "Size": "Ordinal",
+                "Act": "Nominal",
+                "Age": "Nominal",
+                "Inflated": "Nominal"
+            }
+    }
+    target_dict = {"adult": "class",
+                   "car": "price",
+                   "titanic": "Survived",
+                   "bridges": "binaryClass",
+                   "heart": "target",
+                   "audiology": "class",
+                   "car1": "safety",
+                   "random": "Inflated"}
+    encoders_comparison_df = pd.DataFrame(columns=['DataSetName', 'ColumnName', 'ColumnType', 'Encoder', 'EncoderForOthers', 'Score'])
+    i = 0
+    classifiers_list = []
+    for ds_key, df in datasets_dict.items():
+        ground_truth = groundtruth_dict[ds_key]
+        target = target_dict[ds_key]
+        numeric_list = [x for x in ground_truth if ground_truth[x] == 'Numerical']
+        categorical_list = [x for x in ground_truth if ground_truth[x] != 'Numerical']
+        for item in categorical_list:
+            if item != target:
+                col_type = ground_truth[item]
+                single_col = item
+                other_cols = categorical_list
+                other_cols.remove(single_col)
+                other_cols.remove(target)
+                #numeric_list.remove(target)
+                classifiers_list = apply_multiple_encoders_for_one_column_against_others(single_col, other_cols, numeric_list)
+
+                for element in classifiers_list:
+                    key1 = element[0]
+                    key2 = element[1]
+                    classifier = element[2]
+                    X = df.drop(target, axis=1)
+                    y = df[target]
+                    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33, random_state=42)
+
+                    classifier.fit(X_train, y_train)
+                    score = classifier.score(X_test, y_test)
+
+                    encoders_comparison_df.at[i, 'DataSetName'] = ds_key
+                    encoders_comparison_df.at[i, 'ColumnName'] = single_col
+                    encoders_comparison_df.at[i, 'ColumnType'] = col_type
+                    encoders_comparison_df.at[i, 'Encoder'] = key1
+                    encoders_comparison_df.at[i, 'EncoderForOthers'] = key2
+                    encoders_comparison_df.at[i, 'Score'] = score
+                    i += 1
+
+    encoders_comparison_df.to_csv('multiple_encoders_for_all_columns.csv', sep=',', header=True)
+
+
+multiple_encoders_for_all_columns()
+
+
 
