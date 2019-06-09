@@ -64,7 +64,7 @@ def get_classifier(key1, key2, encoder1, encoder2, clf_df, target_label):
         steps=
         [
             ('preprocessor', preprocessor),
-            ('classifier', LogisticRegression(solver='lbfgs', max_iter=1000))
+            ('classifier', LogisticRegression(solver='lbfgs', max_iter=10000))
         ]
     )
     return classifier
@@ -75,12 +75,13 @@ def preprocessing_pipeline(clf_df, target_label):
                     'BinaryEncoder': ce.BinaryEncoder(),
                     'HashingEncoder': ce.HashingEncoder(),
                     # 'OrdinalEncoder': ce.OrdinalEncoder(),
-                    'PolynomialEncoder': ce.PolynomialEncoder(),
+                    # 'PolynomialEncoder': ce.PolynomialEncoder(),
                     # 'TargetEncoder': ce.TargetEncoder(),
-                    'HelmertEncoder': ce.HelmertEncoder(),
+                    # 'HelmertEncoder': ce.HelmertEncoder(),
                     # 'JamesSteinEncoder': ce.JamesSteinEncoder(),
-                    'BaseNEncoder': ce.BaseNEncoder(),
-                    'SumEncoder': ce.SumEncoder()}
+                    # 'BaseNEncoder': ce.BaseNEncoder(),
+                    # 'SumEncoder': ce.SumEncoder()
+                    }
     classifiers_list = []
     for key1, encoder1 in encoder_dict.items():
         for key2, encoder2 in encoder_dict.items():
@@ -127,10 +128,10 @@ def single_pipeline(col, col_type):
                     # 'OrdinalEncoder': ce.OrdinalEncoder(),
                     # 'PolynomialEncoder': ce.PolynomialEncoder(),
                     # 'TargetEncoder': ce.TargetEncoder(),
-                    'HelmertEncoder': ce.HelmertEncoder(),
+                    # 'HelmertEncoder': ce.HelmertEncoder(),
                     # 'JamesSteinEncoder': ce.JamesSteinEncoder(),
-                    'BaseNEncoder': ce.BaseNEncoder(),
-                    'SumEncoder': ce.SumEncoder()
+                    # 'BaseNEncoder': ce.BaseNEncoder(),
+                    # 'SumEncoder': ce.SumEncoder()
                     }
     classifiers_list = []
     if col_type == "Numerical":
@@ -145,7 +146,7 @@ def single_pipeline(col, col_type):
             steps=
             [
                 ('transformer', transformer),
-                ('classifier', LogisticRegression(solver='lbfgs', max_iter=1000))
+                ('classifier', LogisticRegression(solver='lbfgs', max_iter=10000))
             ]
         )
         classifiers_list.append([classifier, "Numerical"])
@@ -162,7 +163,7 @@ def single_pipeline(col, col_type):
                 steps=
                 [
                     ('transformer', transformer),
-                    ('classifier', LogisticRegression(solver='lbfgs', max_iter=1000))
+                    ('classifier', LogisticRegression(solver='lbfgs', max_iter=10000))
                 ]
             )
             classifiers_list.append([classifier, key])
@@ -195,7 +196,6 @@ def single_encoder_against_target():
                 "make": "Nominal",
                 "fuel_type": "Nominal",
                 "aspiration": "Nominal",
-                "num_of_doors": "Numerical",
                 "body_style": "Nominal",
                 "drive_wheels": "Nominal",
                 "engine_location": "Nominal",
@@ -374,7 +374,7 @@ def get_multi_classifier(key1, key2, encoder1, encoder2, single_col, other_cols,
         steps=
         [
             ('preprocessor', preprocessor),
-            ('classifier', LogisticRegression(solver='lbfgs', max_iter=1000))
+            ('classifier', LogisticRegression(solver='lbfgs', max_iter=10000))
         ]
     )
     return classifier
@@ -385,12 +385,13 @@ def apply_multiple_encoders_for_one_column_against_others(single_col, other_cols
                     'BinaryEncoder': ce.BinaryEncoder(),
                     'HashingEncoder': ce.HashingEncoder(),
                     # 'OrdinalEncoder': ce.OrdinalEncoder(),
-                    #'PolynomialEncoder': ce.PolynomialEncoder(),
+                    # 'PolynomialEncoder': ce.PolynomialEncoder(),
                     # 'TargetEncoder': ce.TargetEncoder(),
-                    'HelmertEncoder': ce.HelmertEncoder(),
+                    # 'HelmertEncoder': ce.HelmertEncoder(),
                     # 'JamesSteinEncoder': ce.JamesSteinEncoder(),
-                    'BaseNEncoder': ce.BaseNEncoder(),
-                    'SumEncoder': ce.SumEncoder()}
+                    # 'BaseNEncoder': ce.BaseNEncoder(),
+                    # 'SumEncoder': ce.SumEncoder()
+                    }
     classifiers_list = []
     for key1, encoder1 in encoder_dict.items():
         for key2, encoder2 in encoder_dict.items():
@@ -402,7 +403,7 @@ def apply_multiple_encoders_for_one_column_against_others(single_col, other_cols
 
 
 def multiple_encoders_for_all_columns():
-    datasets_dict = ld.load_data_local()
+    datasets_dict = ld.load_data_online()
     groundtruth_dict = {
         "adult":
             {
@@ -427,7 +428,6 @@ def multiple_encoders_for_all_columns():
                 "make": "Nominal",
                 "fuel_type": "Nominal",
                 "aspiration": "Nominal",
-                "num_of_doors": "Numerical",
                 "body_style": "Nominal",
                 "drive_wheels": "Nominal",
                 "engine_location": "Nominal",
@@ -542,14 +542,16 @@ def multiple_encoders_for_all_columns():
         target = target_dict[ds_key]
         numeric_list = [x for x in ground_truth if ground_truth[x] == 'Numerical']
         categorical_list = [x for x in ground_truth if ground_truth[x] != 'Numerical']
-        categorical_list.remove(target)
+        if target in categorical_list:
+            categorical_list.remove(target)
+        if target in numeric_list:
+            numeric_list.remove(target)
         for item in categorical_list:
             if item != target:
                 col_type = ground_truth[item]
                 single_col = item
                 other_cols = categorical_list
                 other_cols.remove(single_col)
-                #numeric_list.remove(target)
                 classifiers_list = apply_multiple_encoders_for_one_column_against_others(single_col, other_cols, numeric_list)
 
                 for element in classifiers_list:

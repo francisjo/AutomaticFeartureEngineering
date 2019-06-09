@@ -21,14 +21,14 @@ def load_data_online():
     df_car1 = pd.read_csv(car1)
     df_random = pd.read_csv(random)
     df_new_dataset = pd.read_csv(new_dataset)
-    df_dict = {"titanic": df_titanic
-               #"car1": df_car1,
-               #"car": df_car,
-               #"adult": df_adult,
-               #"audiology": df_audiology,
-               #"bridges": df_bridges,
-               #"random": df_random,
-               #"heart": df_heart,
+    df_dict = {"titanic": df_titanic,
+               "car1": df_car1,
+               "car": df_car,
+               "adult": df_adult,
+               "audiology": df_audiology,
+               "bridges": df_bridges,
+               "random": df_random,
+               "heart": df_heart,
                 } #, "new_dataset": df_new_dataset
     return df_dict
 
