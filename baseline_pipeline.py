@@ -1,13 +1,12 @@
 import pandas as pd
 
-from sklearn.model_selection import train_test_split, cross_val_score, GridSearchCV
+from sklearn.model_selection import train_test_split, cross_val_score, GridSearchCV , LeaveOneOut
 from sklearn.metrics import classification_report, confusion_matrix
 from sklearn import tree
 
 import word2vec_load as w2v
 import column_type_classification as col_classify
-import encoders_methods as enc_meth
-import generate_plots as gp
+#import generate_plots as gp
 import load_datasets as ld
 
 
@@ -19,7 +18,7 @@ def run_model_tree(df):
     y = df["Cls-Result"]
 
     # Split Data to Train and Test Data
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0, random_state=42)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=None, random_state=42)
     # Fit Model
     clf = tree.DecisionTreeClassifier(random_state=3)
     grid_search_method(clf, X_train, y_train)
@@ -69,7 +68,7 @@ def run_model_tree(df):
 
 def main_func():
     w2v.init()
-    df_dict = ld.load_data_local()
+    df_dict = ld.load_data_online()
     # df_dict = ld.load_data_local()
     summarized_dfs = col_classify.get_summarized_df(df_dict)
     summarized_dfs = summarized_dfs.set_index("index")
@@ -82,11 +81,9 @@ def main_func():
 
 def grid_search_method(classifier, X_train, y_train):
     grid_param = {
-        'n_estimators': [100, 300, 500, 800, 1000],
         'criterion': ['gini', 'entropy'],
         'splitter': ['best', 'random'],
-        'bootstrap': [True, False],
-        'max_depth ': [3, 4, 5, 6, 7, 8, 9, 10],
+        'max_depth': [3, 4, 5, 6, 7, 8, 9, 10],
         'min_samples_split': [2, 3, 4, 5, 6],
         'min_samples_leaf': [1, 2, 3, 4, 5, 6],
         'max_features': [None, "auto", "sqrt", "log2"]
@@ -104,6 +101,7 @@ def grid_search_method(classifier, X_train, y_train):
 
 
 def cross_validation_method(clf, X_test, y_test):
+    LeaveOneOut()
     # Applying K-Fold Cross Validation
     print("------K-Fold Cross Validation-------")
     accuracies = cross_val_score(estimator=clf, X=X_test, y=y_test, cv=5)
