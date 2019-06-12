@@ -348,20 +348,37 @@ def get_multi_classifier(key1, key2, encoder1, encoder2, single_col, other_cols,
             ('scaler', StandardScaler())
         ]
     )
-    single_col_transformer = Pipeline(
-        steps=
-        [
-            ('imputer', SimpleImputer(strategy="most_frequent", copy=False)),
-            (key1, encoder1)
-        ]
-    )
-    other_cols_transformer = Pipeline(
-        steps=
-        [
-            ('imputer', SimpleImputer(strategy="most_frequent", copy=False)),
-            (key2, encoder2)
-        ]
-    )
+    if key1 != "FrequencyEncoder":
+
+        single_col_transformer = Pipeline(
+            steps=
+            [
+                ('imputer', SimpleImputer(strategy="most_frequent", copy=False)),
+                (key1, encoder1)
+            ]
+        )
+    else:
+        single_col_transformer = Pipeline(
+            steps=
+            [
+                ('imputer', SimpleImputer(strategy="most_frequent", copy=False))
+            ]
+        )
+    if key2 != "FrequencyEncoder":
+        other_cols_transformer = Pipeline(
+            steps=
+            [
+                ('imputer', SimpleImputer(strategy="most_frequent", copy=False)),
+                (key2, encoder2)
+            ]
+        )
+    else:
+        other_cols_transformer = Pipeline(
+            steps=
+            [
+                ('imputer', SimpleImputer(strategy="most_frequent", copy=False))
+            ]
+        )
     preprocessor = ColumnTransformer(
         transformers=
         [
@@ -382,8 +399,9 @@ def get_multi_classifier(key1, key2, encoder1, encoder2, single_col, other_cols,
 
 def apply_multiple_encoders_for_one_column_against_others(single_col, other_cols, numeric_list):
     encoder_dict = {'OneHotEncoder': ce.OneHotEncoder(),
-                    'BinaryEncoder': ce.BinaryEncoder(),
-                    'HashingEncoder': ce.HashingEncoder(),
+                    #'BinaryEncoder': ce.BinaryEncoder(),
+                    #'HashingEncoder': ce.HashingEncoder(),
+                    'FrequencyEncoder': "Freq",
                     # 'OrdinalEncoder': ce.OrdinalEncoder(),
                     # 'PolynomialEncoder': ce.PolynomialEncoder(),
                     # 'TargetEncoder': ce.TargetEncoder(),
@@ -558,6 +576,15 @@ def multiple_encoders_for_all_columns():
                         classifier = element[2]
                         X = df.drop(target, axis=1)
                         y = df[target]
+                        if key1 == 'FrequencyEncoder':
+                            encoding = X.groupby(item).size()
+                            encoding = encoding / len(X)
+                            X[item] = X[item].map(encoding)
+                        if key2 == 'FrequencyEncoder':
+                            for item in other_cols:
+                                encoding = X.groupby(item).size()
+                                encoding = encoding / len(X)
+                                X[item] = X[item].map(encoding)
                         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33, random_state=42)
                         classifier.fit(X_train, y_train)
                         score = classifier.score(X_test, y_test)
@@ -572,7 +599,7 @@ def multiple_encoders_for_all_columns():
         #encoders_comparison_df.to_csv(file_name, sep=',', header=True)
 
 
-    encoders_comparison_df.to_csv('multiple_encoders_for_all_columns110619.csv', sep=',', header=True)
+    encoders_comparison_df.to_csv('multiple_encoders_for_all_columns120619.csv', sep=',', header=True)
 
 
 multiple_encoders_for_all_columns()

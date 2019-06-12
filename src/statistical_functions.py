@@ -10,6 +10,7 @@ from sklearn.preprocessing import LabelEncoder
 from scipy.stats import skew
 
 
+
 # Compute the maximum correlation of values inside each column in the provided data-frame #
 def columns_correlation_classification_max(df):
     result = {}
