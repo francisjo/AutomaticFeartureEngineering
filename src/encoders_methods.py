@@ -397,8 +397,6 @@ def apply_multiple_encoders_for_one_column_against_others(single_col, other_cols
         for key2, encoder2 in encoder_dict.items():
             classifier2 = get_multi_classifier(key2, key1, encoder2, encoder1, single_col, other_cols, numeric_list)
             classifiers_list.append([key1, key2, classifier2])
-        classifier1 = get_multi_classifier(key1, key2, encoder1, encoder2, single_col, other_cols, numeric_list)
-        classifiers_list.append([key1, key2, classifier1])
     return classifiers_list
 
 
@@ -551,7 +549,7 @@ def multiple_encoders_for_all_columns():
                 if item in df.columns:
                     col_type = ground_truth[item]
                     single_col = item
-                    other_cols = categorical_list
+                    other_cols = categorical_list.copy()
                     other_cols.remove(single_col)
                     classifiers_list = apply_multiple_encoders_for_one_column_against_others(single_col, other_cols, numeric_list)
                     for element in classifiers_list:
@@ -561,10 +559,8 @@ def multiple_encoders_for_all_columns():
                         X = df.drop(target, axis=1)
                         y = df[target]
                         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33, random_state=42)
-
                         classifier.fit(X_train, y_train)
                         score = classifier.score(X_test, y_test)
-
                         encoders_comparison_df.at[i, 'DataSetName'] = ds_key
                         encoders_comparison_df.at[i, 'ColumnName'] = single_col
                         encoders_comparison_df.at[i, 'ColumnType'] = col_type
@@ -572,13 +568,18 @@ def multiple_encoders_for_all_columns():
                         encoders_comparison_df.at[i, 'EncoderForOthers'] = key2
                         encoders_comparison_df.at[i, 'Score'] = score
                         i += 1
-        file_name ="multiple_encoders_for_all_"+ ds_key + ".csv"
-        encoders_comparison_df.to_csv(file_name, sep=',', header=True)
+        #file_name ="multiple_encoders_for_all_"+ ds_key + ".csv"
+        #encoders_comparison_df.to_csv(file_name, sep=',', header=True)
 
-    #encoders_comparison_df.to_csv('multiple_encoders_for_all_columns100619.csv', sep=',', header=True)
+
+    encoders_comparison_df.to_csv('multiple_encoders_for_all_columns110619.csv', sep=',', header=True)
 
 
 multiple_encoders_for_all_columns()
+
+
+
+
 
 
 

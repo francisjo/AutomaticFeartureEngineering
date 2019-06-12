@@ -15,7 +15,6 @@ def get_summarized_df(df_dict):
         doc2vec_norm, doc2vec_vector = sf.doc2vec_vector(value)
         doc2vec_df = pd.DataFrame.from_dict(doc2vec_vector,orient="index").reset_index()
         doc2vec_df.fillna(value=0.0, inplace=True)
-
         encoded_df = encode_string_column(value)
         cols_values_skewness = sf.column_values_skewness(encoded_df)
         cols_dist_dict = sf.columns_distribution_classification(encoded_df)
@@ -31,7 +30,8 @@ def get_summarized_df(df_dict):
         summarized_df["Method"] = ["Dist", "Freq", "Corr_Min", "Corr_Max", "Corr_Strong", "Corr", "corr_col", "word2vec_mean", "word2vec_std", "doc2vec_norm", "values_skewness", "Is_binary", "D-Type", "Cls-Result"]
         summarized_df = summarized_df.set_index("Method")
         summarized_df_T = summarized_df.T.reset_index()
-        # summarized_df_T = summarized_df_T.merge(doc2vec_df, on='index')
+        summarized_df_T['Df_Name']= item
+        #summarized_df_T = summarized_df_T.merge(doc2vec_df, on='index')
         get_ground_truth(summarized_df_T, item)
         summarized_dfs = pd.concat([summarized_dfs, summarized_df_T])
 
@@ -44,7 +44,7 @@ def get_summarized_df(df_dict):
     # summarized_dfs = summarized_dfs.join(one_hot)
     summarized_dfs = pd.concat([summarized_dfs, one_hot], axis=1)
     summarized_dfs = correct_missing_column(summarized_dfs)
-    summarized_dfs = summarized_dfs.drop(["Corr_Min", "Corr_Max", "Corr_Strong", "corr_col", "word2vec_std", "word2vec_mean", "Corr", "values_skewness"], axis=1)
+    summarized_dfs = summarized_dfs.drop(["Corr_Min", "Corr_Max", "Corr_Strong", "corr_col", "doc2vec_norm", "Corr", "values_skewness"], axis=1)
 
     return summarized_dfs
 

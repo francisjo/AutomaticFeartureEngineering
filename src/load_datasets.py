@@ -28,7 +28,7 @@ def load_data_online():
                "audiology": df_audiology,
                "bridges": df_bridges,
                "random": df_random,
-               "heart": df_heart,
+               #"heart": df_heart,
                 } #, "new_dataset": df_new_dataset
     return df_dict
 
