@@ -66,29 +66,28 @@ def correct_missing_column(df):
 def get_ground_truth(summarized_df_T, item):
     groundtruth_dict = {
         "adult":
-             {
-                 "age": "Numerical",
-                  "workclass": "Nominal",
-                  "fnlwgt": "Numerical",
-                  "education": "Ordinal",
-                  "education-num": "Ordinal",
-                  "marital-status": "Nominal",
-                  "occupation": "Nominal",
-                  "relationship": "Nominal",
-                  "race": "Nominal",
-                  "sex": "Nominal",
-                  "capital-gain": "Numerical",
-                  "capital-loss": "Numerical",
-                  "hours-per-week": "Numerical",
-                  "native-country": "Nominal",
-                  "class": "Nominal",
-             },
-         "car":
-             {
+            {
+                "age": "Numerical",
+                "workclass": "Nominal",
+                "fnlwgt": "Numerical",
+                "education": "Ordinal",
+                "education-num": "Ordinal",
+                "marital-status": "Nominal",
+                "occupation": "Nominal",
+                "relationship": "Nominal",
+                "race": "Nominal",
+                "sex": "Nominal",
+                "capital-gain": "Numerical",
+                "capital-loss": "Numerical",
+                "hours-per-week": "Numerical",
+                "native-country": "Nominal",
+                "class": "Nominal",
+            },
+        "car":
+            {
                 "make": "Nominal",
                 "fuel_type": "Nominal",
                 "aspiration": "Nominal",
-                "num_of_doors": "Numerical",
                 "body_style": "Nominal",
                 "drive_wheels": "Nominal",
                 "engine_location": "Nominal",
@@ -107,11 +106,11 @@ def get_ground_truth(summarized_df_T, item):
                 "highway_mpg": "Numerical",
                 "price": "Numerical",
                 "curb_weight": "Numerical",
-                "num_of_doors_num": "Nominal",
+                "num_of_doors_num": "Numerical",
                 "num_of_cylinders_num": "Numerical"
             },
-         "titanic":
-             {
+        "titanic":
+            {
                 "PassengerId": "Nominal",
                 "Survived": "Nominal",
                 "Pclass": "Ordinal",
@@ -122,11 +121,11 @@ def get_ground_truth(summarized_df_T, item):
                 "Parch": "Numerical",
                 "Ticket": "Nominal",
                 "Fare": "Numerical",
-                "Cabin": "Ordinal",
+                "Cabin": "Nominal",
                 "Embarked": "Nominal",
-             },
-         "bridges":
-             {
+            },
+        "bridges":
+            {
                 "IDENTIF": "Nominal",
                 "RIVER": "Nominal",
                 "LOCATION": "Numerical",
@@ -140,9 +139,9 @@ def get_ground_truth(summarized_df_T, item):
                 "SPAN": "Ordinal",
                 "REL-L": "Nominal",
                 "binaryClass": "Nominal"
-             },
-         "heart":
-             {
+            },
+        "heart":
+            {
                 "age": "Numerical",
                 "sex": "Nominal",
                 "cp": "Nominal",
@@ -157,8 +156,8 @@ def get_ground_truth(summarized_df_T, item):
                 "ca": "Nominal",
                 "thal": "Ordinal",
                 "target": "Nominal",
-             },
-         "audiology":
+            },
+        "audiology":
             {
                 "air": "Ordinal",
                 "ar_c": "Nominal",
@@ -169,33 +168,23 @@ def get_ground_truth(summarized_df_T, item):
                 "indentifier": "Nominal",
                 "class": "Nominal"
             },
-         "car1":
-             {
-                 "buying": "Nominal",
-                 "maint": "Ordinal",
-                 "doors": "Numerical",
-                 "persons": "Numerical",
-                 "lug_boot": "Ordinal",
-                 "safety": "Ordinal"
-             },
-         "random":
-             {
-                 "Color": "Nominal",
-                 "Size": "Ordinal",
-                 "Act": "Nominal",
-                 "Age": "Nominal",
-                 "Inflated": "Nominal"
-         },
-         "new_dataset":
-             {
-                 "size": "Ordinal",
-                 "temp": "Ordinal",
-                 "level": "Ordinal",
-                 "color": "Nominal",
-                 "traffic": "Ordinal",
-                 "time": "Nominal",
-                 "ID": "Nominal"
-         }
+        "car1":
+            {
+                "buying": "Nominal",
+                "maint": "Ordinal",
+                "doors": "Numerical",
+                "persons": "Numerical",
+                "lug_boot": "Ordinal",
+                "safety": "Ordinal"
+            },
+        "random":
+            {
+                "Color": "Nominal",
+                "Size": "Ordinal",
+                "Act": "Nominal",
+                "Age": "Nominal",
+                "Inflated": "Nominal"
+            }
     }
     for col_name in summarized_df_T['index']:
         result = groundtruth_dict[item].get(col_name)

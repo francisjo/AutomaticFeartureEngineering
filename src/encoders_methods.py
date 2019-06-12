@@ -214,7 +214,7 @@ def single_encoder_against_target():
                 "highway_mpg": "Numerical",
                 "price": "Numerical",
                 "curb_weight": "Numerical",
-                "num_of_doors_num": "Nominal",
+                "num_of_doors_num": "Numerical",
                 "num_of_cylinders_num": "Numerical"
             },
         "titanic":
@@ -229,7 +229,7 @@ def single_encoder_against_target():
                 "Parch": "Numerical",
                 "Ticket": "Nominal",
                 "Fare": "Numerical",
-                "Cabin": "Ordinal",
+                "Cabin": "Nominal",
                 "Embarked": "Nominal",
             },
         "bridges":
@@ -399,11 +399,12 @@ def get_multi_classifier(key1, key2, encoder1, encoder2, single_col, other_cols,
 
 def apply_multiple_encoders_for_one_column_against_others(single_col, other_cols, numeric_list):
     encoder_dict = {'OneHotEncoder': ce.OneHotEncoder(),
-                    #'BinaryEncoder': ce.BinaryEncoder(),
-                    #'HashingEncoder': ce.HashingEncoder(),
+                    'BinaryEncoder': ce.BinaryEncoder(),
+                    'HashingEncoder': ce.HashingEncoder(),
+                    'LabelEncoder': LabelEncoder(),
                     'FrequencyEncoder': "Freq",
-                    # 'OrdinalEncoder': ce.OrdinalEncoder(),
-                    # 'PolynomialEncoder': ce.PolynomialEncoder(),
+                    'OrdinalEncoder': ce.OrdinalEncoder(),
+                    'PolynomialEncoder': ce.PolynomialEncoder(),
                     # 'TargetEncoder': ce.TargetEncoder(),
                     # 'HelmertEncoder': ce.HelmertEncoder(),
                     # 'JamesSteinEncoder': ce.JamesSteinEncoder(),
@@ -413,7 +414,7 @@ def apply_multiple_encoders_for_one_column_against_others(single_col, other_cols
     classifiers_list = []
     for key1, encoder1 in encoder_dict.items():
         for key2, encoder2 in encoder_dict.items():
-            classifier2 = get_multi_classifier(key2, key1, encoder2, encoder1, single_col, other_cols, numeric_list)
+            classifier2 = get_multi_classifier(key1, key2, encoder1, encoder2, single_col, other_cols, numeric_list)
             classifiers_list.append([key1, key2, classifier2])
     return classifiers_list
 
@@ -462,7 +463,7 @@ def multiple_encoders_for_all_columns():
                 "highway_mpg": "Numerical",
                 "price": "Numerical",
                 "curb_weight": "Numerical",
-                "num_of_doors_num": "Nominal",
+                "num_of_doors_num": "Numerical",
                 "num_of_cylinders_num": "Numerical"
             },
         "titanic":
@@ -477,7 +478,7 @@ def multiple_encoders_for_all_columns():
                 "Parch": "Numerical",
                 "Ticket": "Nominal",
                 "Fare": "Numerical",
-                "Cabin": "Ordinal",
+                "Cabin": "Nominal",
                 "Embarked": "Nominal",
             },
         "bridges":
@@ -552,7 +553,6 @@ def multiple_encoders_for_all_columns():
                    "random": "Inflated"}
     encoders_comparison_df = pd.DataFrame(columns=['DataSetName', 'ColumnName', 'ColumnType', 'Encoder', 'EncoderForOthers', 'Score'])
     i = 0
-    classifiers_list = []
     for ds_key, df in datasets_dict.items():
         ground_truth = groundtruth_dict[ds_key]
         target = target_dict[ds_key]
@@ -577,14 +577,14 @@ def multiple_encoders_for_all_columns():
                         X = df.drop(target, axis=1)
                         y = df[target]
                         if key1 == 'FrequencyEncoder':
-                            encoding = X.groupby(item).size()
+                            encoding = X.groupby(single_col).size()
                             encoding = encoding / len(X)
-                            X[item] = X[item].map(encoding)
+                            X[item] = X[single_col].map(encoding)
                         if key2 == 'FrequencyEncoder':
-                            for item in other_cols:
-                                encoding = X.groupby(item).size()
+                            for col in other_cols:
+                                encoding = X.groupby(col).size()
                                 encoding = encoding / len(X)
-                                X[item] = X[item].map(encoding)
+                                X[col] = X[col].map(encoding)
                         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33, random_state=42)
                         classifier.fit(X_train, y_train)
                         score = classifier.score(X_test, y_test)
