@@ -344,16 +344,16 @@ def get_multi_classifier(key1, key2, encoder1, encoder2, single_col, other_cols,
     numeric_transformer = Pipeline(
         steps=
         [
-            ('imputer', SimpleImputer(missing_values=np.NaN, strategy='mean', copy=False)),
+            ('imputer', SimpleImputer(missing_values=np.nan, strategy='mean', copy=False)),
             ('scaler', StandardScaler())
         ]
     )
-    if key1 != "FrequencyEncoder":
+    if key1 not in ["FrequencyEncoder", "LabelEncoder"]:
 
         single_col_transformer = Pipeline(
             steps=
             [
-                ('imputer', SimpleImputer(strategy="most_frequent", copy=False)),
+                ('imputer', SimpleImputer(missing_values=np.nan, strategy="most_frequent", copy=False)),
                 (key1, encoder1)
             ]
         )
@@ -361,14 +361,14 @@ def get_multi_classifier(key1, key2, encoder1, encoder2, single_col, other_cols,
         single_col_transformer = Pipeline(
             steps=
             [
-                ('imputer', SimpleImputer(strategy="most_frequent", copy=False))
+                ('imputer', SimpleImputer(missing_values=np.nan, strategy="most_frequent", copy=False))
             ]
         )
-    if key2 != "FrequencyEncoder":
+    if key2 not in ["FrequencyEncoder", "LabelEncoder"]:
         other_cols_transformer = Pipeline(
             steps=
             [
-                ('imputer', SimpleImputer(strategy="most_frequent", copy=False)),
+                ('imputer', SimpleImputer(missing_values=np.nan, strategy="most_frequent", copy=False)),
                 (key2, encoder2)
             ]
         )
@@ -376,7 +376,7 @@ def get_multi_classifier(key1, key2, encoder1, encoder2, single_col, other_cols,
         other_cols_transformer = Pipeline(
             steps=
             [
-                ('imputer', SimpleImputer(strategy="most_frequent", copy=False))
+                ('imputer', SimpleImputer(missing_values=np.nan, strategy="most_frequent", copy=False))
             ]
         )
     preprocessor = ColumnTransformer(
@@ -401,10 +401,10 @@ def apply_multiple_encoders_for_one_column_against_others(single_col, other_cols
     encoder_dict = {'OneHotEncoder': ce.OneHotEncoder(),
                     'BinaryEncoder': ce.BinaryEncoder(),
                     'HashingEncoder': ce.HashingEncoder(),
-                    'LabelEncoder': LabelEncoder(),
+                    'LabelEncoder': 'Label',
                     'FrequencyEncoder': "Freq",
-                    'OrdinalEncoder': ce.OrdinalEncoder(),
-                    'PolynomialEncoder': ce.PolynomialEncoder(),
+                    # 'OrdinalEncoder': ce.OrdinalEncoder(),
+                    # 'PolynomialEncoder': ce.PolynomialEncoder(),
                     # 'TargetEncoder': ce.TargetEncoder(),
                     # 'HelmertEncoder': ce.HelmertEncoder(),
                     # 'JamesSteinEncoder': ce.JamesSteinEncoder(),
@@ -579,12 +579,21 @@ def multiple_encoders_for_all_columns():
                         if key1 == 'FrequencyEncoder':
                             encoding = X.groupby(single_col).size()
                             encoding = encoding / len(X)
-                            X[item] = X[single_col].map(encoding)
+                            X[single_col] = X[single_col].map(encoding)
+                        if key1 == 'LabelEncoder':
+                            X[single_col] = X[single_col].factorize()[0]
+                            le = LabelEncoder()
+                            X[single_col] = le.fit_transform(X[single_col])
                         if key2 == 'FrequencyEncoder':
                             for col in other_cols:
                                 encoding = X.groupby(col).size()
                                 encoding = encoding / len(X)
                                 X[col] = X[col].map(encoding)
+                        if key2 == 'LabelEncoder':
+                            for col in other_cols:
+                                X[col] = X[col].factorize()[0]
+                                le = LabelEncoder()
+                                X[col] = le.fit_transform(X[col])
                         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33, random_state=42)
                         classifier.fit(X_train, y_train)
                         score = classifier.score(X_test, y_test)
