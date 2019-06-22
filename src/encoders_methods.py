@@ -395,13 +395,13 @@ def get_multi_classifier(key1, key2, encoder1, encoder2, single_col, other_cols,
         ]
     )
     preprocessor = ColumnTransformer(
-        transofrmers=
-            [
-                ('single_col', single_col_transformer, [single_col]),
-                ('num', numeric_transformer, numeric_list),
-                ('other_cols', other_cols_transformer, other_cols)
-            ]
-        )
+        transformers=
+        [
+            ('single_col', single_col_transformer, [single_col]),
+            ('num', numeric_transformer, numeric_list),
+            ('other_cols', other_cols_transformer, other_cols)
+        ]
+    )
     classifier = Pipeline(
         steps=
         [
@@ -409,7 +409,7 @@ def get_multi_classifier(key1, key2, encoder1, encoder2, single_col, other_cols,
             ('classifier', LogisticRegression(solver='lbfgs', multi_class='auto', max_iter=100000))
         ]
     )
-    return classifier
+    return preprocessor
 
 
 def apply_multiple_encoders_for_one_column_against_others(single_col, other_cols, numeric_list):
@@ -419,11 +419,11 @@ def apply_multiple_encoders_for_one_column_against_others(single_col, other_cols
                     #'HashingEncoder': ce.HashingEncoder(),
                     #'LabelEncoder': le.MultiColumnLabelEncoder(),
                     #'FrequencyEncoder': fe.FrequencyEncoder(),
-                    'TargetEncoder': ce.TargetEncoder(),
+                    #'TargetEncoder': ce.TargetEncoder(),
                     # 'HelmertEncoder': ce.HelmertEncoder(),
-                    # 'JamesSteinEncoder': ce.JamesSteinEncoder(),
-                    # 'BaseNEncoder': ce.BaseNEncoder(),
-                    # 'SumEncoder': ce.SumEncoder()
+                     #'JamesSteinEncoder': ce.JamesSteinEncoder(),
+                     #'BaseNEncoder': ce.BaseNEncoder(),
+                    #'SumEncoder': ce.SumEncoder(),
                     }
     classifiers_list = []
     for key1, encoder1 in encoder_dict.items():
@@ -581,20 +581,24 @@ def multiple_encoders_for_all_columns():
                 if item in df.columns:
                     col_type = ground_truth[item]
                     single_col = item
+                    nuuniquevalues = df[single_col].nunique()
                     other_cols = categorical_list.copy()
                     other_cols.remove(single_col)
                     classifiers_list = apply_multiple_encoders_for_one_column_against_others(single_col, other_cols, numeric_list)
                     for element in classifiers_list:
                         key1 = element[0]
                         key2 = element[1]
-                        classifier = element[2]
+                        preprocessor = element[2]
+                        classifier = LogisticRegression(solver='lbfgs', multi_class='auto', max_iter=100000)
                         X = df.drop(target, axis=1)
                         y = df[target]
+                        X = preprocessor.fit_transform(X,y)
                         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33, random_state=42)
                         classifier.fit(X_train, y_train)
                         score = classifier.score(X_test, y_test)
                         encoders_comparison_df.at[i, 'DataSetName'] = ds_key
                         encoders_comparison_df.at[i, 'ColumnName'] = single_col
+                        encoders_comparison_df.at[i, 'nuuniquevalues'] = nuuniquevalues
                         encoders_comparison_df.at[i, 'ColumnType'] = col_type
                         encoders_comparison_df.at[i, 'Encoder'] = key1
                         encoders_comparison_df.at[i, 'EncoderForOthers'] = key2
