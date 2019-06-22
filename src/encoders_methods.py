@@ -10,6 +10,36 @@ import category_encoders as ce
 import load_datasets as ld
 import numpy as np
 import pandas as pd
+import label_encoder as le
+import frequency_encoder as fe
+from sklearn.base import BaseEstimator, TransformerMixin
+
+class FrequencyEncoder(BaseEstimator, TransformerMixin):
+
+    def __init__(self,columns=None):
+        self.columns = columns  # list of column to encode
+
+    def fit(self, X, y=None):
+        return self
+
+    def transform(self, X):
+        '''
+        Transforms columns of X specified in self.columns using
+        LabelEncoder(). If no columns specified, transforms all
+        columns in X.
+        '''
+        output = pd.DataFrame(X.copy())
+        #output = X.copy()
+
+        for colname, col in output.iteritems():
+            encoding = output.groupby(colname).size()
+            encoding = encoding / len(output)
+            output[colname] = output[colname].map(encoding)
+
+        return output
+
+    def fit_transform(self, X, y=None):
+        return self.fit(X, y).transform(X)
 
 
 # drop the target label from a list
@@ -71,9 +101,10 @@ def get_classifier(key1, key2, encoder1, encoder2, clf_df, target_label):
 
 
 def preprocessing_pipeline(clf_df, target_label):
-    encoder_dict = {'OneHotEncoder': ce.OneHotEncoder(),
-                    'BinaryEncoder': ce.BinaryEncoder(),
-                    'HashingEncoder': ce.HashingEncoder(),
+    encoder_dict = {#'OneHotEncoder': ce.OneHotEncoder(),
+                    #'BinaryEncoder': ce.BinaryEncoder(),
+                    #'HashingEncoder': ce.HashingEncoder(),
+                    #'LabelEncoder': MultiColumnLabelEncoder(),
                     # 'OrdinalEncoder': ce.OrdinalEncoder(),
                     # 'PolynomialEncoder': ce.PolynomialEncoder(),
                     # 'TargetEncoder': ce.TargetEncoder(),
@@ -340,53 +371,37 @@ def single_encoder_against_target():
 
 
 def get_multi_classifier(key1, key2, encoder1, encoder2, single_col, other_cols, numeric_list):
-
-    numeric_transformer = Pipeline(
+    numeric_transformer = Pipeline  (
         steps=
         [
             ('imputer', SimpleImputer(missing_values=np.nan, strategy='mean', copy=False)),
             ('scaler', StandardScaler())
         ]
     )
-    if key1 not in ["FrequencyEncoder", "LabelEncoder"]:
 
-        single_col_transformer = Pipeline(
-            steps=
-            [
-                ('imputer', SimpleImputer(missing_values=np.nan, strategy="most_frequent", copy=False)),
-                (key1, encoder1)
-            ]
-        )
-    else:
-        single_col_transformer = Pipeline(
-            steps=
-            [
-                ('imputer', SimpleImputer(missing_values=np.nan, strategy="most_frequent", copy=False))
-            ]
-        )
-    if key2 not in ["FrequencyEncoder", "LabelEncoder"]:
-        other_cols_transformer = Pipeline(
-            steps=
-            [
-                ('imputer', SimpleImputer(missing_values=np.nan, strategy="most_frequent", copy=False)),
-                (key2, encoder2)
-            ]
-        )
-    else:
-        other_cols_transformer = Pipeline(
-            steps=
-            [
-                ('imputer', SimpleImputer(missing_values=np.nan, strategy="most_frequent", copy=False))
-            ]
-        )
-    preprocessor = ColumnTransformer(
-        transformers=
+
+    single_col_transformer = Pipeline(
+        steps=
         [
-            ('single_col', single_col_transformer, [single_col]),
-            ('num', numeric_transformer, numeric_list),
-            ('other_cols', other_cols_transformer, other_cols)
+            ('imputer', SimpleImputer(missing_values=np.nan, strategy="most_frequent", copy=False)),
+            (key1, encoder1)
         ]
     )
+    other_cols_transformer = Pipeline(
+        steps=
+        [
+            ('imputer', SimpleImputer(missing_values=np.nan, strategy="most_frequent", copy=False)),
+            (key2, encoder2)
+        ]
+    )
+    preprocessor = ColumnTransformer(
+        transofrmers=
+            [
+                ('single_col', single_col_transformer, [single_col]),
+                ('num', numeric_transformer, numeric_list),
+                ('other_cols', other_cols_transformer, other_cols)
+            ]
+        )
     classifier = Pipeline(
         steps=
         [
@@ -398,14 +413,13 @@ def get_multi_classifier(key1, key2, encoder1, encoder2, single_col, other_cols,
 
 
 def apply_multiple_encoders_for_one_column_against_others(single_col, other_cols, numeric_list):
-    encoder_dict = {'OneHotEncoder': ce.OneHotEncoder(),
-                    'BinaryEncoder': ce.BinaryEncoder(),
-                    'HashingEncoder': ce.HashingEncoder(),
-                    'LabelEncoder': 'Label',
-                    'FrequencyEncoder': "Freq",
-                    # 'OrdinalEncoder': ce.OrdinalEncoder(),
-                    # 'PolynomialEncoder': ce.PolynomialEncoder(),
-                    # 'TargetEncoder': ce.TargetEncoder(),
+
+    encoder_dict = {#'OneHotEncoder': ce.OneHotEncoder(),
+                    #'BinaryEncoder': ce.BinaryEncoder(),
+                    #'HashingEncoder': ce.HashingEncoder(),
+                    #'LabelEncoder': le.MultiColumnLabelEncoder(),
+                    #'FrequencyEncoder': fe.FrequencyEncoder(),
+                    'TargetEncoder': ce.TargetEncoder(),
                     # 'HelmertEncoder': ce.HelmertEncoder(),
                     # 'JamesSteinEncoder': ce.JamesSteinEncoder(),
                     # 'BaseNEncoder': ce.BaseNEncoder(),
@@ -576,24 +590,6 @@ def multiple_encoders_for_all_columns():
                         classifier = element[2]
                         X = df.drop(target, axis=1)
                         y = df[target]
-                        if key1 == 'FrequencyEncoder':
-                            encoding = X.groupby(single_col).size()
-                            encoding = encoding / len(X)
-                            X[single_col] = X[single_col].map(encoding)
-                        if key1 == 'LabelEncoder':
-                            X[single_col] = X[single_col].factorize()[0]
-                            le = LabelEncoder()
-                            X[single_col] = le.fit_transform(X[single_col])
-                        if key2 == 'FrequencyEncoder':
-                            for col in other_cols:
-                                encoding = X.groupby(col).size()
-                                encoding = encoding / len(X)
-                                X[col] = X[col].map(encoding)
-                        if key2 == 'LabelEncoder':
-                            for col in other_cols:
-                                X[col] = X[col].factorize()[0]
-                                le = LabelEncoder()
-                                X[col] = le.fit_transform(X[col])
                         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33, random_state=42)
                         classifier.fit(X_train, y_train)
                         score = classifier.score(X_test, y_test)
