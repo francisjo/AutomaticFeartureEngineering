@@ -1,9 +1,10 @@
 import pandas as pd
 from sklearn.base import BaseEstimator, TransformerMixin
 
+
 class FrequencyEncoder(BaseEstimator, TransformerMixin):
 
-    def __init__(self,columns=None):
+    def __init__(self, columns=None):
         self.columns = columns  # list of column to encode
 
     def fit(self, X, y=None):
@@ -16,8 +17,6 @@ class FrequencyEncoder(BaseEstimator, TransformerMixin):
         columns in X.
         '''
         output = pd.DataFrame(X.copy())
-        #output = X.copy()
-
         for colname, col in output.iteritems():
             encoding = output.groupby(colname).size()
             encoding = encoding / len(output)

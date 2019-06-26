@@ -17,7 +17,6 @@ class MultiColumnLabelEncoder:
         columns in X.
         '''
         output = pd.DataFrame(X.copy())
-        #output = X.copy()
 
         if self.columns is not None:
             for col in self.columns:

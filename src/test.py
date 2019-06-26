@@ -4,9 +4,6 @@ import scipy.stats as stats
 from scipy.stats import chi2_contingency
 from scipy.stats import chi2
 from decimal import Decimal
-
-titanic = 'C:\\Users\\Joseph Francis\\AutomaticFeartureEngineering\\Datasets\\train.csv'
-df = pd.read_csv(titanic)
 '''
 crosstab = pd.crosstab(df['Cabin'], df["Fare"])
 # crosstab = df.Name.groupby(df['Name']).count()
@@ -21,7 +18,7 @@ else:
 '''
 
 
-
+'''
 def columns_correlation_chi2(df):
     result_isdependent = {}
     result_critical = {}
@@ -61,6 +58,7 @@ def columns_correlation_chi2(df):
 dff = df[['Name', 'Sex', 'Age']].copy()
 result_isdependent, result_critical, result_stat, result_dof = columns_correlation_chi2(dff)
 x=1
+'''
 '''
 def columns_correlation_spearmanr(df):
     result = {}
@@ -176,3 +174,144 @@ def run_model(df):
     return score
 
 '''
+
+
+
+
+
+
+
+#!/usr/bin/env python3
+# -- coding: utf-8 --
+"""
+Created on Wed Jun 19 22:33:54 2019
+
+@author: basha
+"""
+
+
+
+import pandas as pd
+import numpy as np
+from sklearn.pipeline import Pipeline, FeatureUnion
+from sklearn.preprocessing import FunctionTransformer, MinMaxScaler, Imputer
+from sklearn.impute import SimpleImputer
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import AdaBoostClassifier
+from sklearn.metrics import roc_auc_score
+import category_encoders as ce
+from sklearn.preprocessing import LabelEncoder
+from sklearn.preprocessing import StandardScaler
+from sklearn.compose import ColumnTransformer
+from sklearn.preprocessing import OneHotEncoder
+from sklearn.linear_model import LogisticRegression
+
+
+
+adult = 'https://raw.githubusercontent.com/francisjo/AutomaticFeartureEngineering/master/Datasets/train.csv'
+df = pd.read_csv(adult)
+
+#------------------ columns lists ------------------------------
+# numerical
+numeric_list = ['Age', 'SibSp', 'Parch', 'Fare']
+
+# categorical
+
+single_col = 'PassengerId'
+other_cols = ['Pclass', 'Sex',
+            'Ticket', 'Cabin',
+            'Embarked', 'Name']
+
+numeric_transformer = Pipeline(
+        steps=
+        [
+            ('imputer', SimpleImputer(missing_values=np.nan, strategy='mean', copy=False)),
+            ('scaler', StandardScaler())
+        ]
+    )
+single_col_transformer = Pipeline(
+            steps=
+            [
+                ('imputer', SimpleImputer(missing_values=np.nan, strategy="most_frequent", copy=False)),
+                ("key1", ce.TargetEncoder())
+            ]
+        )
+
+other_cols_transformer = Pipeline(
+            steps=
+            [
+                ('imputer', SimpleImputer(missing_values=np.nan, strategy="most_frequent", copy=False)),
+                ("key2", ce.TargetEncoder())
+            ]
+        )
+
+preprocessor = ColumnTransformer(
+        transformers=
+        [
+            ('single_col', single_col_transformer, [single_col]),
+            ('num', numeric_transformer, numeric_list),
+            ('other_cols', other_cols_transformer, other_cols)
+        ]
+    )
+clf = Pipeline(
+    steps=
+    [
+        ('preprocessor', preprocessor),
+        ('classifier', LogisticRegression(solver='lbfgs', multi_class='auto', max_iter=100000))
+    ]
+)
+y = df['Survived']
+X = df.drop('Survived', axis=1)
+#X = df[['PassengerId', 'Age','Pclass','Sex','Embarked']]
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
+
+
+clf.fit(X_train, y_train)
+#clf.fit(df[['Name']], y)
+
+#----------------------- Model evaluation ----------------------------------
+probs_train = clf.predict_proba(X_train)[:, 1]
+probs_test = clf.predict_proba(X_test)[:, 1]
+print("score train: {}".format(roc_auc_score(y_train, probs_train)))
+print("score test: {}".format(roc_auc_score(y_test, probs_test)))
+#------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
