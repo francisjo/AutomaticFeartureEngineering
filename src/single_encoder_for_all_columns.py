@@ -94,4 +94,3 @@ def single_encoder_for_all_columns():
     encoders_comparison_df.to_csv('single_encoder_for_all_columns.csv', sep=',', header=True)
 
 
-single_encoder_for_all_columns()

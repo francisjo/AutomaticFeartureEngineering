@@ -2,115 +2,115 @@ from sklearn.impute import SimpleImputer
 from sklearn.pipeline import Pipeline
 from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import StandardScaler
-from sklearn.linear_model import LogisticRegression
+from sklearn.preprocessing import LabelEncoder
 from sklearn.model_selection import train_test_split
+from sklearn.metrics import roc_auc_score
+from sklearn.tree import DecisionTreeClassifier
+import load_datasets as ld
 import numpy as np
 import pandas as pd
+import main_dicts
 
 
-# drop the target label from a list
-def drop_target_label(cols_list, target_label):
-    for value in cols_list:
-        if value == target_label:
-            cols_list.remove(value)
-            break
-    return cols_list
-
-
-def get_cols_type_lists(clf_df, target_label):
-    # classify columns to categorical and numerical
-    numeric_cols = drop_target_label(clf_df.loc[clf_df["new_clf"] == 1, "index"].tolist(), target_label)
-    nominal_cols = drop_target_label(clf_df.loc[clf_df["new_clf"] == 2, "index"].tolist(), target_label)
-    ordinal_cols = drop_target_label(clf_df.loc[clf_df["new_clf"] == 3, "index"].tolist(), target_label)
-    return numeric_cols, nominal_cols, ordinal_cols
-
-
-def get_classifier(key1, key2, encoder1, encoder2, clf_df, target_label):
-    numeric_cols, nominal_cols, ordinal_cols = get_cols_type_lists(clf_df, target_label)
+def get_preprocessors(key1, key2, encoder1, encoder2, nominal_list, ordinal_list, numeric_list):
     numeric_transformer = Pipeline(
         steps=
         [
-            ('imputer', SimpleImputer(missing_values=np.NaN, strategy='mean', copy=False)),
+            ('imputer', SimpleImputer(missing_values=np.nan, strategy='mean', copy=False)),
             ('scaler', StandardScaler())
         ]
     )
-    categorical_transformer_ordinal = Pipeline(
+
+    nominal_cols_transformer = Pipeline(
         steps=
         [
-            ('imputer', SimpleImputer(strategy="most_frequent", copy=False)),
+            ('imputer', SimpleImputer(missing_values=np.nan, strategy="most_frequent", copy=False)),
             (key1, encoder1)
         ]
     )
-    categorical_transformer_nominal = Pipeline(
+
+    ordinal_cols_transformer = Pipeline(
         steps=
         [
-            ('imputer', SimpleImputer(strategy="most_frequent", copy=False)),
+            ('imputer', SimpleImputer(missing_values=np.nan, strategy="most_frequent", copy=False)),
             (key2, encoder2)
         ]
     )
+
     preprocessor = ColumnTransformer(
         transformers=
         [
-            ('num', numeric_transformer, numeric_cols),
-            ('cat_ordinal', categorical_transformer_ordinal, ordinal_cols),
-            ('cat_nominal', categorical_transformer_nominal, nominal_cols)
+            ('single_col', nominal_cols_transformer, nominal_list),
+            ('other_cols', ordinal_cols_transformer, ordinal_list),
+            ('num', numeric_transformer, numeric_list)
         ]
     )
-    classifier = Pipeline(
-        steps=
-        [
-            ('preprocessor', preprocessor),
-            ('classifier', LogisticRegression(solver='lbfgs', max_iter=100000))
-        ]
-    )
-    return classifier
+
+    return preprocessor
 
 
-def preprocessing_pipeline(clf_df, target_label):
-    encoder_dict = {#'OneHotEncoder': ce.OneHotEncoder(),
-                    #'BinaryEncoder': ce.BinaryEncoder(),
-                    #'HashingEncoder': ce.HashingEncoder(),
-                    #'LabelEncoder': MultiColumnLabelEncoder(),
-                    # 'OrdinalEncoder': ce.OrdinalEncoder(),
-                    # 'PolynomialEncoder': ce.PolynomialEncoder(),
-                    # 'TargetEncoder': ce.TargetEncoder(),
-                    # 'HelmertEncoder': ce.HelmertEncoder(),
-                    # 'JamesSteinEncoder': ce.JamesSteinEncoder(),
-                    # 'BaseNEncoder': ce.BaseNEncoder(),
-                    # 'SumEncoder': ce.SumEncoder()
-                    }
-    classifiers_list = []
+def get_encoders_for_nominal_ordinal_columns(nominal_list, ordinal_list, numeric_list):
+
+    encoder_dict = main_dicts.get_encoder_dict()
+    preprocessors_list = []
     for key1, encoder1 in encoder_dict.items():
         for key2, encoder2 in encoder_dict.items():
-            classifier2 = get_classifier(key2, key1, encoder2, encoder1, clf_df, target_label)
-            classifiers_list.append([key1, key2, classifier2])
-        classifier1 = get_classifier(key1, key2, encoder1, encoder2, clf_df, target_label)
-        classifiers_list.append([key1, key2, classifier1])
-
-    return classifiers_list
+            preprocessor = get_preprocessors(key1, key2, encoder1, encoder2, nominal_list, ordinal_list, numeric_list)
+            preprocessors_list.append([key1, key2, preprocessor])
+    return preprocessors_list
 
 
-def run_model_representation(df, clf_df):
-    target_label = "safety"
-    classifiers_list = preprocessing_pipeline(clf_df, target_label)
-    encoders_comparison_df = pd.DataFrame(columns=['NominalEncoder', 'OrdinalEncoder', 'FinalScore'])
+def ordinal_vs_nominal_encoding():
+    datasets_dict = ld.load_data_online()
+    groundtruth_dict = main_dicts.get_groundtruth_dict()
+    target_dict = main_dicts.get_target_variables_dicts()
+    encoders_comparison_df = pd.DataFrame(columns=['DataSetName', 'NominalEncoder', 'OrdinalEncoder', 'Score'])
     i = 0
-    for element in classifiers_list:
-        key1 = element[0]
-        key2 = element[1]
-        classifier = element[2]
-        X = df.drop(target_label, axis=1)
-        y = df[target_label]
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33, random_state=42)
+    for ds_key, df in datasets_dict.items():
+        ground_truth = groundtruth_dict[ds_key]
+        target = target_dict[ds_key]
+        le = LabelEncoder()
+        df[target] = le.fit_transform(df[target])
+        numeric_list = [x for x in ground_truth if ground_truth[x] == 'Numerical']
+        nominal_list = [x for x in ground_truth if ground_truth[x] == 'Nominal']
+        ordinal_list = [x for x in ground_truth if ground_truth[x] == 'Ordinal']
+        if target in numeric_list:
+            numeric_list.remove(target)
+        elif target in nominal_list:
+            nominal_list.remove(target)
+        elif target in ordinal_list:
+            ordinal_list.remove(target)
+        filtered_nominal_list = []
+        filtered_ordinal_list = []
+        for item in nominal_list:
+            if item != target:
+                if item in df.columns:
+                    filtered_nominal_list.append(item)
+        for item in ordinal_list:
+            if item != target:
+                if item in df.columns:
+                    filtered_ordinal_list.append(item)
+        preprocessors_list = get_encoders_for_nominal_ordinal_columns(filtered_nominal_list, filtered_ordinal_list, numeric_list)
+        for element in preprocessors_list:
+            key1 = element[0]
+            key2 = element[1]
+            preprocessor = element[2]
+            classifier = DecisionTreeClassifier(random_state=23)
+            X = df.drop(target, axis=1)
+            y = df[target]
+            X = preprocessor.fit_transform(X, y)
+            X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33, random_state=42)
+            classifier.fit(X_train, y_train)
+            score = classifier.score(X_test, y_test)
+            # score = roc_auc_score(y, classifier.predict(X))
+            encoders_comparison_df.at[i, 'DataSetName'] = ds_key
+            encoders_comparison_df.at[i, 'NominalEncoder'] = key1
+            encoders_comparison_df.at[i, 'OrdinalEncoder'] = key2
+            encoders_comparison_df.at[i, 'Score'] = score
+            i += 1
+        # file_name ="multiple_encoders_for_all_"+ ds_key + ".csv"
+        # encoders_comparison_df.to_csv(file_name, sep=',', header=True)
+    encoders_comparison_df.to_csv('ordinal_vs_nominal_encoding.csv', sep=',', header=True)
 
-        classifier.fit(X_train, y_train)
-        score = classifier.score(X_test, y_test)
 
-        encoders_comparison_df.at[i, 'NominalEncoder'] = key1
-        encoders_comparison_df.at[i, 'OrdinalEncoder'] = key2
-        encoders_comparison_df.at[i, 'FinalScore'] = score
-        i += 1
-
-    encoders_comparison_df.to_csv('encoders_comparison.csv', sep=',', header=True)
-    # print(encoders_comparison_df)
-
+ordinal_vs_nominal_encoding()

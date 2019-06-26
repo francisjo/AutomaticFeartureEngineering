@@ -12,7 +12,7 @@ import pandas as pd
 import main_dicts
 
 
-def get_multi_classifier(key1, key2, encoder1, encoder2, single_col, other_cols, numeric_list):
+def get_preprocessor(key1, key2, encoder1, encoder2, single_col, other_cols, numeric_list):
     numeric_transformer = Pipeline  (
         steps=
         [
@@ -49,18 +49,17 @@ def get_multi_classifier(key1, key2, encoder1, encoder2, single_col, other_cols,
     return preprocessor
 
 
-def apply_multiple_encoders_for_one_column_against_others(single_col, other_cols, numeric_list):
-
+def get_encoders_for_one_column_against_others(single_col, other_cols, numeric_list):
     encoder_dict = main_dicts.get_encoder_dict()
-    classifiers_list = []
+    preprocessors_list = []
     for key1, encoder1 in encoder_dict.items():
         for key2, encoder2 in encoder_dict.items():
-            classifier2 = get_multi_classifier(key1, key2, encoder1, encoder2, single_col, other_cols, numeric_list)
-            classifiers_list.append([key1, key2, classifier2])
-    return classifiers_list
+            preprocessor = get_preprocessor(key1, key2, encoder1, encoder2, single_col, other_cols, numeric_list)
+            preprocessors_list.append([key1, key2, preprocessor])
+    return preprocessors_list
 
 
-def multiple_encoders_for_all_columns():
+def one_col_encoding_against_other_cols():
     datasets_dict = ld.load_data_online()
     groundtruth_dict = main_dicts.get_groundtruth_dict()
     target_dict = main_dicts.get_target_variables_dicts()
@@ -85,8 +84,8 @@ def multiple_encoders_for_all_columns():
                     nuuniquevalues = df[single_col].nunique()
                     other_cols = categorical_list.copy()
                     other_cols.remove(single_col)
-                    classifiers_list = apply_multiple_encoders_for_one_column_against_others(single_col, other_cols, numeric_list)
-                    for element in classifiers_list:
+                    preprocessors_list = get_encoders_for_one_column_against_others(single_col, other_cols, numeric_list)
+                    for element in preprocessors_list:
                         key1 = element[0]
                         key2 = element[1]
                         preprocessor = element[2]
@@ -106,10 +105,8 @@ def multiple_encoders_for_all_columns():
                         encoders_comparison_df.at[i, 'Cardinality'] = nuuniquevalues
                         encoders_comparison_df.at[i, 'Score'] = score
                         i += 1
-        file_name ="multiple_encoders_for_all_"+ ds_key + ".csv"
-        encoders_comparison_df.to_csv(file_name, sep=',', header=True)
-
-
-    #encoders_comparison_df.to_csv('multiple_encoders_for_all_columns120619.csv', sep=',', header=True)
+        # file_name ="multiple_encoders_for_all_"+ ds_key + ".csv"
+        # encoders_comparison_df.to_csv(file_name, sep=',', header=True)
+    encoders_comparison_df.to_csv('one_col_encoding_against_other_cols.csv', sep=',', header=True)
 
 
