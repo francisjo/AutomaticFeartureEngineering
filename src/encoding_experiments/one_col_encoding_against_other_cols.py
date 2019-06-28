@@ -2,7 +2,7 @@ from sklearn.impute import SimpleImputer
 from sklearn.pipeline import Pipeline
 from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import StandardScaler
-from sklearn.preprocessing import LabelEncoder , LabelBinarizer
+from sklearn.preprocessing import LabelEncoder, LabelBinarizer
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import roc_auc_score
 from sklearn.tree import DecisionTreeClassifier
@@ -11,11 +11,13 @@ import numpy as np
 import pandas as pd
 import main_dicts
 
+
 def change_column_type(df, cat_list):
     for col in df.columns:
         if col in cat_list:
             df[col].astype('object', copy=False)
     return df
+
 
 def multiclass_roc_auc_score(y_test, y_pred, average="macro"):
     lb = LabelBinarizer()
@@ -23,6 +25,7 @@ def multiclass_roc_auc_score(y_test, y_pred, average="macro"):
     y_test = lb.transform(y_test)
     y_pred = lb.transform(y_pred)
     return roc_auc_score(y_test, y_pred, average=average)
+
 
 def get_preprocessor(key1, key2, encoder1, encoder2, single_col, other_cols, numeric_list):
     numeric_transformer = Pipeline  (

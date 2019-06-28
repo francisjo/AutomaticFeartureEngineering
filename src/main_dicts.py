@@ -2,9 +2,10 @@ import category_encoders as ce
 import label_encoder as le
 import frequency_encoder as fe
 
+
 def get_groundtruth_dict():
     groundtruth_dict = {
-        "adult":
+        "Adult":
             {
                 "age": "Numerical",
                 "workclass": "Nominal",
@@ -22,7 +23,7 @@ def get_groundtruth_dict():
                 "native-country": "Nominal",
                 "class": "Nominal",
             },
-        "car":
+        "Car":
             {
                 "make": "Nominal",
                 "fuel_type": "Nominal",
@@ -48,7 +49,7 @@ def get_groundtruth_dict():
                 "num_of_doors_num": "Numerical",
                 "num_of_cylinders_num": "Numerical"
             },
-        "titanic":
+        "Titanic":
             {
                 "PassengerId": "Nominal",
                 "Survived": "Nominal",
@@ -63,7 +64,7 @@ def get_groundtruth_dict():
                 "Cabin": "Nominal",
                 "Embarked": "Nominal",
             },
-        "bridges":
+        "Bridges":
             {
                 "IDENTIF": "Nominal",
                 "RIVER": "Nominal",
@@ -79,24 +80,24 @@ def get_groundtruth_dict():
                 "REL-L": "Nominal",
                 "binaryClass": "Nominal"
             },
-        "heart":
+        "Heart":
             {
                 "age": "Numerical",
                 "sex": "Nominal",
-                "cp": "Nominal",
+                "cp": "Numerical",
                 "trestbps": "Numerical",
                 "chol": "Numerical",
-                "fbs": "Nominal",
-                "restecg": "Nominal",
+                "fbs": "Numerical",
+                "restecg": "Numerical",
                 "thalach": "Numerical",
-                "exang": "Nominal",
+                "exang": "Numerical",
                 "oldpeak": "Numerical",
-                "slope": "Ordinal",
-                "ca": "Nominal",
-                "thal": "Ordinal",
+                "slope": "Numerical",
+                "ca": "Numerical",
+                "thal": "Numerical",
                 "target": "Nominal",
             },
-        "audiology":
+        "Audiology":
             {
                 "air": "Ordinal",
                 "ar_c": "Nominal",
@@ -107,36 +108,49 @@ def get_groundtruth_dict():
                 "indentifier": "Nominal",
                 "class": "Nominal"
             },
-        "car1":
+        "Car1":
             {
                 "buying": "Nominal",
                 "maint": "Ordinal",
                 "doors": "Numerical",
                 "persons": "Numerical",
                 "lug_boot": "Ordinal",
-                "safety": "Ordinal"
+                "safety": "Ordinal",
+                "class": "nominal"
             },
-        "random":
+        "Random":
             {
                 "Color": "Nominal",
                 "Size": "Ordinal",
                 "Act": "Nominal",
                 "Age": "Nominal",
                 "Inflated": "Nominal"
+            },
+        "Nursery":
+            {
+                "parents": "Nominal",
+                "has_nurs": "Ordinal",
+                "form": "Nominal",
+                "children": "Numerical",
+                "housing": "Ordinal",
+                "finance": "Nominal",
+                "social": "Ordinal",
+                "health": "Nominal"
             }
     }
     return groundtruth_dict
 
 
 def get_target_variables_dicts():
-    target_dict = {"adult": "class",
-                   "car": "price",
-                   "titanic": "Survived",
-                   "bridges": "binaryClass",
-                   "heart": "target",
-                   "audiology": "class",
-                   "car1": "safety",
-                   "random": "Inflated"}
+    target_dict = {"Adult": "class",
+                   "Car": "price",
+                   "Titanic": "Survived",
+                   "Bridges": "binaryClass",
+                   "Heart": "target",
+                   "Audiology": "class",
+                   "Car1": "class",
+                   "Random": "Inflated",
+                   "Nursery": "health"}
     return target_dict
 
 

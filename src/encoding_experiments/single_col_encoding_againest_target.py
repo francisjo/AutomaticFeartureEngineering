@@ -58,7 +58,6 @@ def change_column_type(df, cat_list):
 
 
 def best_encoders_dict(dataframe):
-    #x = dataframe.groupby(dataframe['ColumnName'], as_index=False)['Score'].idxmax()
     df1 = dataframe.loc[dataframe.groupby(['ColumnName'], as_index=False)['Score'].idxmax()]
     best_encoders_dict = df1.groupby('Encoder')['ColumnName'].apply(lambda g: g.values.tolist()).to_dict()
     return best_encoders_dict
@@ -82,15 +81,12 @@ def run_best_encoding_methods(groundtruth_dict, datasets_dict, encoders_comparis
         ground_truth = groundtruth_dict[ds_key]
         numeric_list = [x for x in ground_truth if ground_truth[x] == 'Numerical']
         categorical_list = [x for x in ground_truth if ground_truth[x] != 'Numerical']
-        #if target in categorical_list:
-        #    categorical_list.remove(target)
         if target in numeric_list:
             numeric_list.remove(target)
         df = change_column_type(df, categorical_list)
         le = LabelEncoder()
         df[target] = le.fit_transform(df[target])
         best_encoders_dict = encoders_dict_dfs[ds_key]
-        ###############################################
         numeric_transformer = Pipeline(
             steps=
             [
@@ -125,12 +121,14 @@ def run_best_encoding_methods(groundtruth_dict, datasets_dict, encoders_comparis
         score = classifier.score(X_test, y_test)
         print(ds_key, score)
 
+
 def multiclass_roc_auc_score(y_test, y_pred, average="macro"):
     lb = LabelBinarizer()
     lb.fit(y_test)
     y_test = lb.transform(y_test)
     y_pred = lb.transform(y_pred)
     return roc_auc_score(y_test, y_pred, average=average)
+
 
 def multiple_encoders_for_all_columns():
     datasets_dict = ld.load_data_online()
@@ -176,15 +174,17 @@ def multiple_encoders_for_all_columns():
                         encoders_comparison_df.at[i, 'Score'] = score
                         encoders_comparison_df.at[i, 'Roc_auc_score'] = roc_auc_score
                         i += 1
-        print("finished")
         #run_best_encoding_methods(groundtruth_dict, datasets_dict, encoders_comparison_df)
         #file_name ="multiple_encoders_for_all_"+ ds_key + ".csv"
         #encoders_comparison_df.to_csv(file_name, sep=',', header=True)
-        print("completed finished")
-    encoders_comparison_df.to_csv('single_col_againest_target2806.csv', sep=',', header=True)
+    encoders_comparison_df.to_csv('single_col_against_target_2806.csv', sep=',', header=True)
 
-#datasets_dict = ld.load_data_online()
-#roundtruth_dict = main_dicts.get_groundtruth_dict()
-#encoders_comparison_df = pd.read_csv('C:\\Users\\Joseph Francis\\AutomaticFeartureEngineering\\src\\single_col_againest_target.csv')
-#run_best_encoding_methods(groundtruth_dict, datasets_dict, encoders_comparison_df)
-multiple_encoders_for_all_columns()
+
+#multiple_encoders_for_all_columns()
+
+'''
+datasets_dict = ld.load_data_online()
+groundtruth_dict = main_dicts.get_groundtruth_dict()
+encoders_comparison_df = pd.read_csv('/home/basha/PycharmProjects/DSA_Project/AutomaticFeartureEngineering/src/encoding_experiments/results/single_col_against_target_2806.csv')
+run_best_encoding_methods(groundtruth_dict, datasets_dict, encoders_comparison_df)
+'''

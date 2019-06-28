@@ -59,11 +59,13 @@ def get_encoders_for_nominal_ordinal_columns(nominal_list, ordinal_list, numeric
             preprocessors_list.append([key1, key2, preprocessor])
     return preprocessors_list
 
+
 def change_column_type(df, cat_list):
     for col in df.columns:
         if col in cat_list:
             df[col].astype('object', copy=False)
     return df
+
 
 def multiclass_roc_auc_score(y_test, y_pred, average="macro"):
     lb = LabelBinarizer()
@@ -127,7 +129,6 @@ def ordinal_vs_nominal_encoding():
             i += 1
         # file_name ="multiple_encoders_for_all_"+ ds_key + ".csv"
         # encoders_comparison_df.to_csv(file_name, sep=',', header=True)
-    encoders_comparison_df.to_csv('ordinal_vs_nominal_encoding.csv', sep=',', header=True)
+    encoders_comparison_df.to_csv('results/ordinal_vs_nominal_encoding_2806.csv', sep=',', header=True)
 
 
-ordinal_vs_nominal_encoding()

@@ -11,6 +11,7 @@ def load_data_online():
     car1 = 'https://raw.githubusercontent.com/francisjo/AutomaticFeartureEngineering/master/Datasets/car1.csv'
     random = 'https://raw.githubusercontent.com/francisjo/AutomaticFeartureEngineering/master/Datasets/random.csv'
     new_dataset = 'https://raw.githubusercontent.com/francisjo/AutomaticFeartureEngineering/master/Datasets/new_dataset.csv'
+    nursery = 'https://raw.githubusercontent.com/francisjo/AutomaticFeartureEngineering/master/Datasets/nursery.csv'
 
     df_titanic = pd.read_csv(titanic)
     df_car = pd.read_csv(car)
@@ -21,14 +22,16 @@ def load_data_online():
     df_car1 = pd.read_csv(car1)
     df_random = pd.read_csv(random)
     df_new_dataset = pd.read_csv(new_dataset)
-    df_dict = {"titanic": df_titanic,
-               #"car1": df_car1,
-               #"car": df_car,
-               #"adult": df_adult,
-               #"audiology": df_audiology,
-               #"bridges": df_bridges,
-               #"random": df_random,
-               #"heart": df_heart,
-               #"new_dataset": df_new_dataset
+    df_nursery = pd.read_csv(nursery)
+    df_dict = {"Titanic": df_titanic,
+               "Car1": df_car1,
+               "Car": df_car,
+               "Adult": df_adult,
+               #"Audiology": df_audiology,
+               "Bridges": df_bridges,
+               #"Random": df_random,
+               "Heart": df_heart,
+               "Nursery": df_nursery,
+               #"New_dataset": df_new_dataset
                }
     return df_dict

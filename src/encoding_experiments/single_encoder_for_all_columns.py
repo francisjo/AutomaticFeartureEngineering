@@ -11,12 +11,14 @@ import numpy as np
 import pandas as pd
 import main_dicts
 
+
 def multiclass_roc_auc_score(y_test, y_pred, average="macro"):
     lb = LabelBinarizer()
     lb.fit(y_test)
     y_test = lb.transform(y_test)
     y_pred = lb.transform(y_pred)
     return roc_auc_score(y_test, y_pred, average=average)
+
 
 def change_column_type(df, cat_list):
     for col in df.columns:
@@ -106,6 +108,7 @@ def single_encoder_for_all_columns():
 
         # file_name ="multiple_encoders_for_all_"+ ds_key + ".csv"
         # encoders_comparison_df.to_csv(file_name, sep=',', header=True)
-    encoders_comparison_df.to_csv('single_encoder_for_all_columns.csv', sep=',', header=True)
+    encoders_comparison_df.to_csv('results/single_encoder_for_all_columns_2806.csv', sep=',', header=True)
 
 
+single_encoder_for_all_columns()
