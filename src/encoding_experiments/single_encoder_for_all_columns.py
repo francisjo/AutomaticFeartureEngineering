@@ -2,7 +2,7 @@ from sklearn.impute import SimpleImputer
 from sklearn.pipeline import Pipeline
 from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import StandardScaler
-from sklearn.preprocessing import LabelEncoder
+from sklearn.preprocessing import LabelEncoder, LabelBinarizer
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import roc_auc_score
 from sklearn.tree import DecisionTreeClassifier
@@ -10,6 +10,19 @@ import load_datasets as ld
 import numpy as np
 import pandas as pd
 import main_dicts
+
+def multiclass_roc_auc_score(y_test, y_pred, average="macro"):
+    lb = LabelBinarizer()
+    lb.fit(y_test)
+    y_test = lb.transform(y_test)
+    y_pred = lb.transform(y_pred)
+    return roc_auc_score(y_test, y_pred, average=average)
+
+def change_column_type(df, cat_list):
+    for col in df.columns:
+        if col in cat_list:
+            df[col].astype('object', copy=False)
+    return df
 
 
 def get_preprocessors(key, encoder, cat_list, numeric_list):
@@ -72,6 +85,7 @@ def single_encoder_for_all_columns():
             if item != target:
                 if item in df.columns:
                     filtered_categorical_list.append(item)
+        df = change_column_type(df, filtered_categorical_list)
         preprocessors_list = get_encoders_for_one_column(filtered_categorical_list, numeric_list)
         for element in preprocessors_list:
             key = element[0]
@@ -83,10 +97,11 @@ def single_encoder_for_all_columns():
             X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33, random_state=42)
             classifier.fit(X_train, y_train)
             score = classifier.score(X_test, y_test)
-            # score = roc_auc_score(y, classifier.predict(X))
+            roc_auc_score = multiclass_roc_auc_score(y_test, classifier.predict(X_test))
             encoders_comparison_df.at[i, 'DataSetName'] = ds_key
             encoders_comparison_df.at[i, 'Encoder'] = key
             encoders_comparison_df.at[i, 'Score'] = score
+            encoders_comparison_df.at[i, 'Roc_auc_score'] = roc_auc_score
             i += 1
 
         # file_name ="multiple_encoders_for_all_"+ ds_key + ".csv"

@@ -6,7 +6,6 @@ from scipy.stats import chi2
 import pandas.api.types as ptypes
 import numpy as np
 import word2vec_load as w2v
-from sklearn.preprocessing import LabelEncoder
 from scipy.stats import skew
 
 

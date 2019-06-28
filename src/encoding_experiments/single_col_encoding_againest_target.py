@@ -2,7 +2,7 @@ from sklearn.impute import SimpleImputer
 from sklearn.pipeline import Pipeline
 from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import StandardScaler
-from sklearn.preprocessing import LabelEncoder
+from sklearn.preprocessing import LabelEncoder, LabelBinarizer
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import roc_auc_score
 from sklearn.tree import DecisionTreeClassifier
@@ -58,8 +58,8 @@ def change_column_type(df, cat_list):
 
 
 def best_encoders_dict(dataframe):
-    x = dataframe.groupby(dataframe['ColumnName'], as_index=False)['Score'].idxmax()
-    df1 = dataframe.groupby('ColumnName')['Encoder','ColumnName','Score'].idxmax()
+    #x = dataframe.groupby(dataframe['ColumnName'], as_index=False)['Score'].idxmax()
+    df1 = dataframe.loc[dataframe.groupby(['ColumnName'], as_index=False)['Score'].idxmax()]
     best_encoders_dict = df1.groupby('Encoder')['ColumnName'].apply(lambda g: g.values.tolist()).to_dict()
     return best_encoders_dict
 
@@ -125,6 +125,12 @@ def run_best_encoding_methods(groundtruth_dict, datasets_dict, encoders_comparis
         score = classifier.score(X_test, y_test)
         print(ds_key, score)
 
+def multiclass_roc_auc_score(y_test, y_pred, average="macro"):
+    lb = LabelBinarizer()
+    lb.fit(y_test)
+    y_test = lb.transform(y_test)
+    y_pred = lb.transform(y_pred)
+    return roc_auc_score(y_test, y_pred, average=average)
 
 def multiple_encoders_for_all_columns():
     datasets_dict = ld.load_data_online()
@@ -161,19 +167,24 @@ def multiple_encoders_for_all_columns():
                         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33, random_state=42)
                         classifier.fit(X_train, y_train)
                         score = classifier.score(X_test, y_test)
-                        #score = roc_auc_score(y_train, classifier.predict(X_train))
+                        roc_auc_score = multiclass_roc_auc_score(y_test, classifier.predict(X_test))
                         encoders_comparison_df.at[i, 'DataSetName'] = ds_key
                         encoders_comparison_df.at[i, 'ColumnName'] = single_col
                         encoders_comparison_df.at[i, 'ColumnType'] = col_type
                         encoders_comparison_df.at[i, 'Encoder'] = key
                         encoders_comparison_df.at[i, 'Cardinality'] = nuuniquevalues
                         encoders_comparison_df.at[i, 'Score'] = score
+                        encoders_comparison_df.at[i, 'Roc_auc_score'] = roc_auc_score
                         i += 1
-        run_best_encoding_methods(groundtruth_dict, datasets_dict, encoders_comparison_df)
+        print("finished")
+        #run_best_encoding_methods(groundtruth_dict, datasets_dict, encoders_comparison_df)
         #file_name ="multiple_encoders_for_all_"+ ds_key + ".csv"
         #encoders_comparison_df.to_csv(file_name, sep=',', header=True)
-    encoders_comparison_df.to_csv('single_col_againest_target.csv', sep=',', header=True)
+        print("completed finished")
+    encoders_comparison_df.to_csv('single_col_againest_target2806.csv', sep=',', header=True)
 
-
-
+#datasets_dict = ld.load_data_online()
+#roundtruth_dict = main_dicts.get_groundtruth_dict()
+#encoders_comparison_df = pd.read_csv('C:\\Users\\Joseph Francis\\AutomaticFeartureEngineering\\src\\single_col_againest_target.csv')
+#run_best_encoding_methods(groundtruth_dict, datasets_dict, encoders_comparison_df)
 multiple_encoders_for_all_columns()
