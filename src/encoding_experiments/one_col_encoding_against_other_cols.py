@@ -124,6 +124,7 @@ def one_col_encoding_against_other_cols():
                         i += 1
         # file_name ="multiple_encoders_for_all_"+ ds_key + ".csv"
         # encoders_comparison_df.to_csv(file_name, sep=',', header=True)
-    encoders_comparison_df.to_csv('one_col_encoding_against_other_cols.csv', sep=',', header=True)
+    encoders_comparison_df.to_csv('results/one_col_encoding_against_other_cols_2806.csv', sep=',', header=True)
 
 
+one_col_encoding_against_other_cols()
