@@ -116,7 +116,7 @@ def get_groundtruth_dict():
                 "persons": "Numerical",
                 "lug_boot": "Ordinal",
                 "safety": "Ordinal",
-                "class": "nominal"
+                "class": "Nominal"
             },
         "Random":
             {
@@ -125,6 +125,13 @@ def get_groundtruth_dict():
                 "Act": "Nominal",
                 "Age": "Nominal",
                 "Inflated": "Nominal"
+            },
+        "New_dataset":
+            {
+                "size": "Ordinal",
+                "temp": "Ordinal",
+                "level": "Ordinal",
+                "color": "Nominal",
             },
         "Nursery":
             {
@@ -136,6 +143,27 @@ def get_groundtruth_dict():
                 "finance": "Nominal",
                 "social": "Ordinal",
                 "health": "Nominal"
+            },
+        "Books":
+            {
+                "author_average_rating": "Numerical",
+                "author_gender": "Nominal",
+                "author_genres": "Nominal",
+                "author_id": "Nominal",
+                "author_name": "Nominal",
+                "author_page_url": "Nominal",
+                "author_rating_count": "Numerical",
+                "author_review_count": "Numerical",
+                "birthplace": "Nominal",
+                "book_average_rating": "Numerical",
+                "book_fullurl": "Nominal",
+                "book_title": "Nominal",
+                "genre_1": "Nominal",
+                "genre_2": "Nominal",
+                "num_ratings": "Numerical",
+                "num_reviews": "Numerical",
+                "pages": "Numerical",
+                "new score": "Nominal"
             }
     }
     return groundtruth_dict
@@ -150,7 +178,8 @@ def get_target_variables_dicts():
                    "Audiology": "class",
                    "Car1": "class",
                    "Random": "Inflated",
-                   "Nursery": "health"}
+                   "Nursery": "health",
+                   "books": "new score"}
     return target_dict
 
 
