@@ -33,7 +33,7 @@ def get_multi_classifier(key, encoder, single_col, numeric_list):
         transformers=
         [
             ('single_col', single_col_transformer, [single_col]),
-            ('num', numeric_transformer, numeric_list)
+            #('num', numeric_transformer, numeric_list)
         ]
     )
 
@@ -160,27 +160,28 @@ def multiple_encoders_for_all_columns():
                         preprocessor = element[1]
                         classifier = DecisionTreeClassifier(random_state=23)
                         X = df.drop(target, axis=1)
+                        X = X.drop(numeric_list, axis=1)
                         y = df[target]
                         X = preprocessor.fit_transform(X, y)
                         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33, random_state=42)
                         classifier.fit(X_train, y_train)
                         score = classifier.score(X_test, y_test)
-                        roc_auc_score = multiclass_roc_auc_score(y_test, classifier.predict(X_test))
+                        #roc_auc_score = multiclass_roc_auc_score(y_test, classifier.predict(X_test))
                         encoders_comparison_df.at[i, 'DataSetName'] = ds_key
                         encoders_comparison_df.at[i, 'ColumnName'] = single_col
                         encoders_comparison_df.at[i, 'ColumnType'] = col_type
                         encoders_comparison_df.at[i, 'Encoder'] = key
                         encoders_comparison_df.at[i, 'Cardinality'] = nuuniquevalues
                         encoders_comparison_df.at[i, 'Score'] = score
-                        encoders_comparison_df.at[i, 'Roc_auc_score'] = roc_auc_score
+                        encoders_comparison_df.at[i, 'Roc_auc_score'] = 0
                         i += 1
         #run_best_encoding_methods(groundtruth_dict, datasets_dict, encoders_comparison_df)
         #file_name ="multiple_encoders_for_all_"+ ds_key + ".csv"
         #encoders_comparison_df.to_csv(file_name, sep=',', header=True)
-    encoders_comparison_df.to_csv('single_col_against_target_2806.csv', sep=',', header=True)
+    encoders_comparison_df.to_csv('single_col_against_target_0307.csv', sep=',', header=True)
 
 
-#multiple_encoders_for_all_columns()
+multiple_encoders_for_all_columns()
 
 '''
 datasets_dict = ld.load_data_online()
