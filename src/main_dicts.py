@@ -44,7 +44,7 @@ def get_groundtruth_dict():
                 "peak_rpm": "Numerical",
                 "city_mpg": "Numerical",
                 "highway_mpg": "Numerical",
-                "price": "Numerical",
+                "price": "Ordinal",
                 "curb_weight": "Numerical",
                 "num_of_doors_num": "Numerical",
                 "num_of_cylinders_num": "Numerical"
@@ -110,7 +110,7 @@ def get_groundtruth_dict():
             },
         "Car1":
             {
-                "buying": "Nominal",
+                "buying": "Ordinal",
                 "maint": "Ordinal",
                 "doors": "Numerical",
                 "persons": "Numerical",
@@ -163,7 +163,7 @@ def get_groundtruth_dict():
                 "num_ratings": "Numerical",
                 "num_reviews": "Numerical",
                 "pages": "Numerical",
-                "new score": "Nominal"
+                "score": "Nominal"
             }
     }
     return groundtruth_dict
