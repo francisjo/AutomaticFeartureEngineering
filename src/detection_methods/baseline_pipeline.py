@@ -71,8 +71,8 @@ def run_model_tree(df):
 
         print("Features Importance:  ", feature_importances)
     
-        # print("------Classification Report-------")
-        # print(classification_report(y_test, y_predict))
+        print("------Classification Report-------")
+        print(classification_report(y_test, y_predict))
         score = clf.score(X_test, y_test)
         print("Decision Tree Score: ", score)
         predictdf = pd.DataFrame(y_predict)
@@ -86,8 +86,8 @@ def run_model_tree(df):
         final_clf_df['Df_Name'] = df_name
         print(final_clf_df)
         final_clf_dfs = pd.concat([final_clf_dfs, final_clf_df])
-    final_clf_importance_score_dfs.to_csv('results/final_clf_importance_score_dfs.csv', sep=',', header=True)
-    final_clf_dfs.to_csv('results/final_clf_dfs.csv', sep=',', header=True)
+    final_clf_importance_score_dfs.to_csv('final_clf_importance_score_dfs0607_Word2vecv1.csv', sep=',', header=True)
+    final_clf_dfs.to_csv('final_clf_dfs0607_Word2vecv1.csv', sep=',', header=True)
     return final_clf_df
 
 
